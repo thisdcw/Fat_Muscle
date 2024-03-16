@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#fefffe">
+
+        <LinearLayout
+            android:id="@+id/measure_root"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#fefffe"
+            android:orientation="vertical">
+
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/bottom_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="35dp"
+                        android:drawablePadding="5dp"
+                        android:text="@string/app_measure_resule_bottom_title"
+                        android:textColor="#999999"
+                        android:textSize="14dp" />
+
+                    <ImageView
+                        android:id="@+id/iv_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:layout_below="@+id/bottom_title"
+                        android:layout_marginLeft="22dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="32dp"
+                        android:scaleType="fitXY" />
+
+                    <com.cw.fatmuscle.view.MeasurePlusView
+                        android:id="@+id/view_measure"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:layout_below="@+id/bottom_title"
+                        android:layout_marginLeft="22dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="32dp"
+                        android:scaleType="fitXY" />
+
+                    <com.cw.fatmuscle.view.MeasureDividingRuleView
+                        android:id="@+id/view_dividing_rule"
+                        android:layout_width="32dp"
+                        android:layout_height="250dp"
+                        android:layout_below="@+id/bottom_title"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="0dp" />
+
+                    <TextView
+                        android:id="@+id/status_tip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/iv_image"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="15dp"
+                        android:gravity="center"
+                        android:text="@string/collecting"
+                        android:textColor="#999999"
+                        android:textSize="14dp" />
+
+                    <TextView
+                        android:id="@+id/analysis_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/iv_image"
+                        android:layout_marginLeft="45dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="45dp"
+                        android:gravity="center"
+                        android:text="@string/analysis"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="16sp"
+                        android:visibility="gone" />
+                </RelativeLayout>
+                <TextView
+                    android:id="@+id/show_reason"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="测量结果"
+                    android:textSize="20sp"/>
+            </FrameLayout>
+
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</layout>

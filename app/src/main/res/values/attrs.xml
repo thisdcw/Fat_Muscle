@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="layout_marginTopPercent" format="string">
+    </attr>
+    <attr name="layout_heightPercent" format="string">
+    </attr>
+    <attr name="layout_widthPercent" format="string">
+    </attr>
+
+</resources>

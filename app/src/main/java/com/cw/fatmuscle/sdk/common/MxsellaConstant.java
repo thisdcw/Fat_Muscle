@@ -1,0 +1,152 @@
+package com.cw.fatmuscle.sdk.common;
+
+import android.os.Environment;
+
+public class MxsellaConstant {
+    public static final int DEVICE_DLPF_M_VALUE = 4288;
+
+    public static final int DEVICE_RXATE_DELAY = 4301;
+
+    public static final int DEVICE_DLPF_PARA = 4289;
+
+    public static final int DEVICE_LINE_CYCLE = 4293;
+
+    public static final int DEVICE_DR_PARA = 4291;
+
+    public static final String ACCESS_TOKEN = "access_token";
+    public static final int DEVICE_CLEAN_FTP_FILEDIR = 24737;
+    public static final int DEVICE_CLEAR_WLAN_MSG_ID = 165;
+    public static final int DEVICE_CONFIG_MSG_ID = 4280;
+    public static final int DEVICE_CONNECTED_MSG_ID = 0;
+    public static final int DEVICE_DISCONNECTED_MSG_ID = -1;
+    public static final int DEVICE_FACTORY_INFO_MSG_ID = 4263;
+    public static final String DEVICE_IP = "10.0.0.1";
+    public static final int DEVICE_MAC_INFO_MSG_ID = 4257;
+    public static final int DEVICE_REAL_B = 65278;
+    public static final int DEVICE_REAL_RF = 65021;
+    public static final int DEVICE_REBOOT_MSG_ID = 167;
+    public static final int DEVICE_SETUP_WLAN_MSG_ID = 163;
+    public static final int DEVICE_SHUTDOWN_MSG_ID = 169;
+    public static final int DEVICE_START_UPDATE_MSG_ID = 24739;
+    public static final int DEVICE_SWICH_CHANNEL_MSG_ID = 168;
+    public static final int DEVICE_SYNC_TIME_MSG_ID = 161;
+    public static final String DEVICE_UDP_CONNECTED_MSG_ID = "CONNECTED";
+    public static final String DEVICE_UDP_DISCONNECTED_MSG_ID = "DISCONNECTED";
+    public static final String DEVICE_UDP_ONLINE_BROADCAST_MSG_ID = "device_online_status_broadcast";
+    public static final int DEVICE_UPDATE_STATUS = 24741;
+    public static final String IMAGE_STATUS = "param_status";
+    public static final String IMAGE_TYPE = "shooting_mode";
+    public static final String LOGIN_TIME = "login_time";
+    public static final int QUERY_DEVICE_STATUS_MSG_ID = 4261;
+    public static final int QUERY_DEVICE_VER_MSG_ID = 4276;
+    public static final int TCP_IMAGE_PORT = 8888;
+    public static final int TCP_PORT = 5002;
+    public static final int UDP_PORT = 5001;
+    public static final int UDP_STATUS_MSG_ID = 1;
+    public static final String UITRAL_DEC_VALUE = "dec";
+    public static final String UITRAL_INC_VALUE = "inc";
+    public static final int ULTRA_DEHP_MSG_ID = 28841;
+    public static final int ULTRA_DEPTH_MSG_ID = 28858;
+    public static final int ULTRA_DRANGE_MSG_ID = 28859;
+    public static final int ULTRA_EDAGE_ENHANCE_MSG_ID = 28867;
+    public static final int ULTRA_EXIT_BRIGHTNESS_MSG_ID = 28854;
+    public static final int ULTRA_EXIT_CONTRAST_MSG_ID = 28855;
+    public static final int ULTRA_EXIT_SLEEP_MSG_ID = 28853;
+    public static final int ULTRA_FILE_TCP_PORT = 6768;
+    public static final int ULTRA_FOCUSPOS_MSG_ID = 28866;
+    public static final int ULTRA_FREEZE_MSG_ID = 28838;
+    public static final int ULTRA_GAIN_MSG_ID = 28857;
+    public static final int ULTRA_GRAY_MSG_ID = 28860;
+    public static final int ULTRA_PERSIST_MSG_ID = 28865;
+    public static final int ULTRA_REBOOT_DEVICE_MSG_ID = 167;
+    public static final int ULTRA_REHECTION_MSG_ID = 28862;
+    public static final int ULTRA_SLEEP_MSG_ID = 28852;
+    public static final int ULTRA_SMOOTH_MSG_ID = 28864;
+    public static final int ULTRA_SRI_MSG_ID = 28863;
+    public static final int ULTRA_SWICH_CHANNEL_MSG_ID = 28856;
+    public static final int ULTRA_SWITCH_3D_MSG_ID = 28842;
+    public static final int ULTRA_SWITCH_4D_MSG_ID = 28843;
+    public static final int ULTRA_SYSNTHETIC_MSG_ID = 28861;
+    public static final int ULTRA_SYSTEM_BUSY_MSG_ID = 17476;
+    public static final int ULTRA_TCP_PORT = 6767;
+    public static final int ULTRA_TINT_MSG_ID = 28868;
+    public static final int ULTRA_TO_B_MSG_ID = 28850;
+    public static final int ULTRA_VOI_DOWN_MSG_ID = 28845;
+    public static final int ULTRA_VOI_LEFT_MSG_ID = 28846;
+    public static final int ULTRA_VOI_RIGHT_MSG_ID = 28847;
+    public static final int ULTRA_VOI_UP_MSG_ID = 28844;
+    public static final int ULTRA_VOI_VALUE_MSG_ID = 28851;
+    public static final int ULTRA_VOI_ZOOM_IN_MSG_ID = 28848;
+    public static final int ULTRA_VOI_ZOOM_OUT_MSG_ID = 28849;
+    public static final int ULTRA_VOLUME_3D_MSG_ID = 28839;
+    public static final int ULTRA_VOLUME_4D_MSG_ID = 28840;
+    public static String configFilePath = "sdcard/Android/usl/";
+    public static final String MARVOTO_PATH = Environment.getExternalStorageDirectory() + "/DCIM/Marvoto";
+//    public static final String APP_SECRET_KEY = VolAlg.VolGetCode();
+    public static final String AUTO_MEASURE_MODE = "AUTO_MEASURE_MODE";
+    public static final String BLE_CUR_DEVICE_ADDRESS = "ble_cur_device_address";
+    public static final String BLE_CUR_DEVICE_VERSION = "ble_cur_device_version";
+    public static final String CUR_DEPTH = "cur_depth_key";
+    public static final String CUR_TEST_POSITION = "cur_test_position";
+    public static final String CUR_UNIT = "cur_unit_key";
+    public static final String DEFPATH;
+    public static final String FANGKE_MODE = "fangke_mode";
+    public static final String FANGKE_SEX = "fangke_sex";
+    public static final String FAT_RECORD_USER_DATA_CACHE = "user_data_cache_fat_record";
+    public static final String GUIDE_TIP = "guide_tip_";
+    public static final String HEAD_URL_INFO_IMAGE_LOAD = "INFO_IMAGE_LOAD";
+    public static String ICON = null;
+    public static final String IMAGEPATH;
+    public static final String IS_FIRST = "is_first";
+    public static final String IS_FIRST_GUIDE = "is_first_guide";
+    public static final String IS_FIRST_OPEN_BOX = "is_first_open_box";
+    public static final String IS_FIRST_OPEN_MEASURE_LINE_GUIDE = "is_first_open_measure_line_guide";
+    public static final String IS_FIRST_OPEN_MUSCLE_GUIDE = "is_first_open_muscle_guide";
+    public static final String IS_LOGIN_PHONE = "is_login_phone";
+    public static final String IS_MEMBER_UPDATE = "is_member_update";
+    public static final String IS_PERSONAL_DATA = "is_personal_data";
+    public static final String IS_REFRESH = "is_refresh";
+    public static final String IS_REGISTER_SKIP = "is_register_skip";
+    public static final String IS_REMEMBER_PASSWORD = "is_remember_password";
+    public static final String LOCATION = "location";
+    public static final String MEASURE_MODE = "measure_mode";
+    public static final String MEMBER_PERSONAL_INFO = "member_personal_info";
+    public static final int PART_ARM = 2;
+    public static final int PART_ARM_BEFORE = 7;
+    public static final int PART_BRUST = 4;
+    public static final int PART_FACE = 1;
+    public static final int PART_FUBU = 6;
+    public static final int PART_Other_One = 11;
+    public static final int PART_Other_Two = 12;
+    public static final int PART_THIGH = 3;
+    public static final int PART_WAIST = 0;
+    public static final int PART_XIAOTUI = 5;
+    public static final String RSSI_FILTER = "rssi_filter";
+    public static final String USER_EMAIL = "user_email";
+    public static final String USER_NAME = "user_name";
+    public static final String USER_PERSONAL_INFO = "user_personal_info";
+    public static boolean isDebug = false;
+    public static boolean isProduct = false;
+    public static boolean isSupportAutoSynCloud = true;
+    public static boolean isSupportBlueFun = true;
+    public static int supportOnlyZ1OrZ2;
+    public static String APP_DIR_PATH = Environment.getExternalStorageDirectory() + "/FatDetector";
+    public static String CACH_PHONE_MIDIR = APP_DIR_PATH + "/icon";
+    public static String ICON_TEMP = CACH_PHONE_MIDIR + "/temp01.jpeg";
+//    public static String sCOMMON_PROBLEM = "http://www.marvoto.com/marvotowebsite/index.php/qa_z1_en";
+//    public static String sCOMMON_PROBLEM_CN = "http://www.marvoto.com/cn/index.php/m1-2/";
+//    public static String Z2_sCOMMON_PROBLEM = "http://www.marvoto.com/marvotowebsite/index.php/qa-z2/";
+//    public static String Z2_sCOMMON_PROBLEM_CN = "http://www.marvoto.com/cn/index.php/z2/qaz2/";
+//    public static String URL_OTG_GUIDE_EN = "http://www.marvoto.com/marvotowebsite/index.php/otg-guideline/";
+//    public static String URL_OTG_GUIDE_CN = "http://www.marvoto.com/cn/index.php/otg-guideline/";
+//    public static String URL_OPEN_BOX_EN = "https://marvoto-hk.oss-cn-hongkong.aliyuncs.com/faq/z1_open_box_video.mp4";
+
+    static {
+        String str = Environment.getExternalStorageDirectory() + "/DCIM/Camera";
+        DEFPATH = str;
+        ICON = str + "/temp.jpeg";
+        IMAGEPATH = str + "/image";
+    }
+
+
+}

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<params>
+    <item>
+        <data-length>256
+        </data-length>
+        <depth-leve>
+            <leve defaultbodyposition="2" value="40">
+                <depth>5
+                </depth>
+                <gain>18
+                </gain>
+                <sendcycle>10
+                </sendcycle>
+                <dynamic>60
+                </dynamic>
+            </leve>
+            <leve defaultbodyposition="0,1,3,4,5,6,7" value="70">
+                <depth>7
+                </depth>
+                <gain>23
+                </gain>
+                <sendcycle>10
+                </sendcycle>
+                <dynamic>60
+                </dynamic>
+            </leve>
+        </depth-leve>
+    </item>
+    <item>
+        <data-length>477
+        </data-length>
+        <depth-leve>
+            <leve defaultbodyposition="" value="37">
+                <depth>2
+                </depth>
+                <gain>35
+                </gain>
+                <sendcycle>10
+                </sendcycle>
+                <dynamic>60
+                </dynamic>
+                <gain-leve>
+                    <gain-item>32
+                    </gain-item>
+                    <gain-item>35
+                    </gain-item>
+                    <gain-item>38
+                    </gain-item>
+                </gain-leve>
+            </leve>
+            <leve defaultbodyposition="0,1,2,3,4,5,6,7" value="56">
+                <depth>3
+                </depth>
+                <gain>30
+                </gain>
+                <sendcycle>10
+                </sendcycle>
+                <dynamic>60
+                </dynamic>
+                <gain-leve>
+                    <gain-item>27
+                    </gain-item>
+                    <gain-item>30
+                    </gain-item>
+                    <gain-item>35
+                    </gain-item>
+                </gain-leve>
+            </leve>
+            <leve defaultbodyposition="" value="74">
+                <depth>4
+                </depth>
+                <gain>23
+                </gain>
+                <sendcycle>10
+                </sendcycle>
+                <dynamic>60
+                </dynamic>
+                <gain-leve>
+                    <gain-item>20
+                    </gain-item>
+                    <gain-item>23
+                    </gain-item>
+                    <gain-item>28
+                    </gain-item>
+                </gain-leve>
+            </leve>
+        </depth-leve>
+    </item>
+    <item>
+        <data-length>496
+        </data-length>
+        <depth-leve>
+            <leve defaultbodyposition="2" value="40">
+                <depth>2
+                </depth>
+                <gain>35
+                </gain>
+                <sendcycle>10
+                </sendcycle>
+                <dynamic>60
+                </dynamic>
+            </leve>
+            <leve defaultbodyposition="0,1,3,4,5,6,7" value="70">
+                <depth>3
+                </depth>
+                <gain>30
+                </gain>
+                <sendcycle>10
+                </sendcycle>
+                <dynamic>60
+                </dynamic>
+            </leve>
+        </depth-leve>
+    </item>
+</params>

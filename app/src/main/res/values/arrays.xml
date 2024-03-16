@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="leve_mark_color">
+        <item>@color/standard_ggx</item>
+        <item>@color/standard_jzx</item>
+        <item>@color/standard_rgx</item>
+        <item>@color/standard_fmx</item>
+        <item>@color/standard_zrx</item>
+        <item>@color/standard_fpx</item>
+    </array>
+    <array name="leve_standard_str">
+        <item>@string/ggx</item>
+        <item>@string/jzx</item>
+        <item>@string/rgx</item>
+        <item>@string/fmx</item>
+        <item>@string/zrx</item>
+        <item>@string/fpx</item>
+    </array>
+
+<!--        <array name="leve_mark_drawable">-->
+<!--        <item>@drawable/standard_ggx</item>-->
+<!--        <item>@drawable/standard_jzx</item>-->
+<!--        <item>@drawable/standard_rgx</item>-->
+<!--        <item>@drawable/standard_fmx</item>-->
+<!--        <item>@drawable/standard_zrx</item>-->
+<!--        <item>@drawable/fpx_standard</item>-->
+<!--    </array>-->
+    <array name="leve_mark_icon">
+        <item>@drawable/dingwei_leve1</item>
+        <item>@drawable/dingwei_leve2</item>
+        <item>@drawable/dingwei_leve3</item>
+        <item>@drawable/dingwei_leve4</item>
+        <item>@drawable/dingwei_leve5</item>
+        <item>@drawable/dingwei_leve6</item>
+    </array>
+
+    <array name="part_arm_female_leve">
+        <item>6</item>
+        <item>8</item>
+        <item>10</item>
+        <item>13</item>
+        <item>16</item>
+        <item>19</item>
+    </array>
+    <array name="part_arm_male_leve">
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>10</item>
+    </array>
+    <array name="part_fubu_female_leve">
+        <item>6</item>
+        <item>9</item>
+        <item>13</item>
+        <item>16</item>
+        <item>20</item>
+        <item>24</item>
+    </array>
+    <array name="part_fubu_male_leve">
+        <item>5</item>
+        <item>8</item>
+        <item>12</item>
+        <item>15</item>
+        <item>19</item>
+        <item>22</item>
+    </array>
+    <array name="part_thigh_female_leve">
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>9</item>
+        <item>11</item>
+        <item>14</item>
+    </array>
+    <array name="part_thigh_male_leve">
+        <item>4</item>
+        <item>6</item>
+        <item>8</item>
+        <item>10</item>
+        <item>12</item>
+        <item>15</item>
+    </array>
+    <array name="part_waist_female_leve">
+        <item>6</item>
+        <item>8</item>
+        <item>11</item>
+        <item>14</item>
+        <item>18</item>
+        <item>21</item>
+    </array>
+    <array name="part_waist_male_leve">
+        <item>5</item>
+        <item>8</item>
+        <item>11</item>
+        <item>14</item>
+        <item>18</item>
+        <item>21</item>
+    </array>
+    <array name="part_xiaotui_female_leve">
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>9</item>
+        <item>11</item>
+        <item>13</item>
+    </array>
+    <array name="part_xiaotui_male_leve">
+        <item>4</item>
+        <item>6</item>
+        <item>8</item>
+        <item>10</item>
+        <item>12</item>
+        <item>15</item>
+    </array>
+</resources>
