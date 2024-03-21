@@ -13,14 +13,12 @@
         android:background="@color/white"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hello World!"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/muscle"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@color/Orange"
+            android:text="肌肉" />
 
         <Button
             android:id="@+id/fat"
@@ -29,12 +27,127 @@
             android:background="@color/Yellow"
             android:text="脂肪" />
 
+
         <Button
-            android:id="@+id/muscle"
+            android:id="@+id/record"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="@color/Orange"
-            android:text="肌肉" />
+            android:background="@color/Blue"
+            android:text="测量记录" />
 
+<!--        <Button-->
+<!--            android:id="@+id/test"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="200dp"-->
+<!--            android:background="@color/Blue"-->
+<!--            android:text="调试" />-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="肌肉: "
+                    android:textSize="24dp" />
+
+                <Button
+                    android:id="@+id/fuzhiji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="腹直肌" />
+
+                <Button
+                    android:id="@+id/gongertouji"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="肱二头肌" />
+
+                <Button
+                    android:id="@+id/tongyong1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="通用" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="脂肪: "
+                    android:textSize="12sp" />
+
+                <Button
+                    android:id="@+id/shangbi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="上臂" />
+
+                <Button
+                    android:id="@+id/xiaotui"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="小腿" />
+
+                <Button
+                    android:id="@+id/yaobu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="腰部" />
+
+                <Button
+                    android:id="@+id/datui"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="大腿" />
+
+                <Button
+                    android:id="@+id/tongyong2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:text="通用" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/selectPart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="请选择部位"
+                android:textSize="48sp" />
+        </LinearLayout>
     </LinearLayout>
 </layout>

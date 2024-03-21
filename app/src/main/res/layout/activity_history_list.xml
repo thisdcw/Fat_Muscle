@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <com.mxsella.fatmuscle.view.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/rl_head"
+            layout="@layout/common_title_info"
+            android:layout_width="match_parent"
+            android:layout_height="65dp" />
+
+        <LinearLayout
+            android:layout_marginTop="65dp"
+            android:layout_width="match_parent"
+            android:layout_height="27dp"
+            android:gravity="center_vertical"
+            android:paddingEnd="10dp">
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="0.9"
+                android:gravity="center"
+                android:text="@string/app_history_time"
+                android:textColor="#ff999999"
+                android:textSize="9sp" />
+
+            <TextView
+                android:id="@+id/tv_position"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="1.1"
+                android:gravity="center"
+                android:text="@string/test_position"
+                android:textColor="#ff999999"
+                android:textSize="9sp" />
+
+            <TextView
+                android:id="@+id/tv_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_weight="1.1"
+                android:gravity="center"
+                android:text="@string/app_history_type"
+                android:textColor="#ff999999"
+                android:textSize="9sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_weight="1.1"
+                android:gravity="center"
+                android:text="@string/app_history_fat_thickness"
+                android:textColor="#ff999999"
+                android:textSize="9sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_weight="1.1"
+                android:gravity="center"
+                android:text="@string/operation"
+                android:textColor="#ff999999"
+                android:textSize="9sp" />
+        </LinearLayout>
+
+        <com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout
+            android:id="@+id/refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/rl_head">
+
+            <ListView
+                android:id="@+id/lv_history"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="6dp"
+                android:divider="#00000000"
+                android:dividerHeight="12dp"
+                android:fadingEdge="none"
+                android:scrollbars="none" />
+        </com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout>
+
+        <TextView
+            android:id="@+id/tv_empty_hint"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="@string/app_main_empty_no_data"
+            android:textColor="#64000000"
+            android:textSize="12dp" />
+    </com.mxsella.fatmuscle.view.percent.PercentRelativeLayout>
+</layout>

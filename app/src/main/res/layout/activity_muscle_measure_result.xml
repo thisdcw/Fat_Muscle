@@ -6,12 +6,12 @@
 
     </data>
 
-    <com.cw.fatmuscle.view.percent.PercentRelativeLayout
+    <com.mxsella.fatmuscle.view.percent.PercentRelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#fefffe">
 
-        <com.cw.fatmuscle.view.percent.PercentRelativeLayout
+        <com.mxsella.fatmuscle.view.percent.PercentRelativeLayout
             android:id="@+id/measure_root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -39,7 +39,7 @@
                 app:layout_marginTopPercent="3%h"
                 app:layout_widthPercent="35%h" />
 
-            <com.cw.fatmuscle.view.ResultRoundView
+            <com.mxsella.fatmuscle.view.ResultRoundView
                 android:id="@+id/rv"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -76,7 +76,7 @@
                     android:layout_marginRight="32dp"
                     android:scaleType="fitXY" />
 
-                <com.cw.fatmuscle.view.MeasureView
+                <com.mxsella.fatmuscle.view.MeasureView
                     android:id="@+id/view_measure"
                     android:layout_width="match_parent"
                     android:layout_height="210dp"
@@ -86,7 +86,7 @@
                     android:scaleType="fitXY"
                     android:visibility="gone" />
 
-                <com.cw.fatmuscle.view.SlideLineView
+                <com.mxsella.fatmuscle.view.SlideLineView
                     android:id="@+id/view_slide"
                     android:layout_width="match_parent"
                     android:layout_height="210dp"
@@ -95,7 +95,7 @@
                     android:layout_marginRight="32dp"
                     android:scaleType="fitXY" />
 
-                <com.cw.fatmuscle.view.MeasureDividingRuleView
+                <com.mxsella.fatmuscle.view.MeasureDividingRuleView
                     android:id="@+id/view_dividing_rule"
                     android:layout_width="32dp"
                     android:layout_height="210dp"
@@ -119,7 +119,7 @@
                     android:textSize="16sp"
                     android:visibility="gone" />
             </RelativeLayout>
-        </com.cw.fatmuscle.view.percent.PercentRelativeLayout>
+        </com.mxsella.fatmuscle.view.percent.PercentRelativeLayout>
 
         <FrameLayout
             android:id="@+id/fragment_container"
@@ -134,19 +134,7 @@
             android:padding="31dp"
             android:background="@color/Yellow"/>
 
-
-
-
-        <ImageView
-            android:id="@+id/body_position"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_marginTop="45dp"
-            android:layout_marginRight="12dp"
-            android:layout_toLeftOf="@+id/share_measure"
-            android:src="@drawable/jirou" />
-
-        <com.cw.fatmuscle.view.percent.PercentRelativeLayout
+        <com.mxsella.fatmuscle.view.percent.PercentRelativeLayout
             android:id="@+id/show_save_rl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -183,89 +171,7 @@
                     android:textColor="@color/app_main_tab_unselector"
                     android:textSize="16sp" />
             </RelativeLayout>
-        </com.cw.fatmuscle.view.percent.PercentRelativeLayout>
+        </com.mxsella.fatmuscle.view.percent.PercentRelativeLayout>
 
-        <com.cw.fatmuscle.view.percent.PercentRelativeLayout
-            android:id="@+id/show_operation_rl"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/suggest_tip_bg"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/operation_tip"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:gravity="center"
-                android:text="@string/fuzhiji_title"
-                android:textColor="@color/app_main_tab_unselector"
-                android:textSize="16sp" />
-
-            <ImageView
-                android:id="@+id/tip_close"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="12dp"
-                android:padding="31dp"
-                android:background="@color/black"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/operation_tip"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginRight="20dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/note_top"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:text="@string/fuzhiji_step1"
-                    android:textColor="@color/app_main_tab_unselector"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/note_bottom"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/fuzhiji_step1_tip"
-                    android:textColor="@color/app_main_tab_unselector"
-                    android:textSize="14sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="15dp"
-                    android:gravity="center">
-
-                    <Button
-                        android:id="@+id/last"
-                        style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="100dp"
-                        android:layout_height="30dp"
-                        android:layout_margin="0dp"
-                        android:background="@drawable/btn_bg_shape"
-                        android:padding="0dp"
-                        android:text="@string/last"
-                        android:textColor="#fffefe" />
-
-                    <Button
-                        android:id="@+id/next"
-                        style="?android:attr/borderlessButtonStyle"
-                        android:layout_width="160dp"
-                        android:layout_height="30dp"
-                        android:layout_marginLeft="10dp"
-                        android:background="#ffffff"
-                        android:padding="0dp"
-                        android:text="@string/next"
-                        android:textColor="#ffe4a305" />
-                </LinearLayout>
-            </LinearLayout>
-        </com.cw.fatmuscle.view.percent.PercentRelativeLayout>
-    </com.cw.fatmuscle.view.percent.PercentRelativeLayout>
+    </com.mxsella.fatmuscle.view.percent.PercentRelativeLayout>
 </layout>

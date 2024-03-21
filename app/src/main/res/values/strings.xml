@@ -513,4 +513,6 @@
     <string name="z2_device_desc">肌脂仪</string>
     <string name="zrx">赘肉型</string>
     <string name="zrx_suggest">脂肪有点多了，体型上可见赘肉，可以考虑减去一些脂肪</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

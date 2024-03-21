@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <com.mxsella.fatmuscle.view.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.mxsella.fatmuscle.view.widget.NoScrollViewPager
+            android:id="@+id/fragment_vp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/tabs_rg"
+            android:background="#fffefffe" />
+
+        <RadioGroup
+            android:id="@+id/tabs_rg"
+            android:layout_width="match_parent"
+            android:layout_height="47dp"
+            android:layout_alignParentBottom="true"
+            android:background="#dcdcdc"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/tab_messure"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#fff7f7f7"
+                android:button="@null"
+                android:checked="true"
+                android:drawableTop="@drawable/app_main_measure_selector"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:text="@string/app_main_tab_measure"
+                android:textColor="@color/app_main_tab_text_color_selector"
+                android:textSize="9sp" />
+
+            <RadioButton
+                android:id="@+id/tab_curve"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#fff7f7f7"
+                android:button="@null"
+                android:checked="false"
+                android:drawableTop="@drawable/app_main_curve_selector"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:text="@string/app_main_tab_curve"
+                android:textColor="@color/app_main_tab_text_color_selector"
+                android:textSize="9sp" />
+
+            <RadioButton
+                android:id="@+id/tab_my"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#fff7f7f7"
+                android:button="@null"
+                android:drawableTop="@drawable/app_main_my_selector"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:text="@string/app_main_tab_my"
+                android:textColor="@color/app_main_tab_text_color_selector"
+                android:textSize="9sp" />
+        </RadioGroup>
+    </com.mxsella.fatmuscle.view.percent.PercentRelativeLayout>
+</layout>

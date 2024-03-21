@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <com.mxsella.fatmuscle.view.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/rl_head"
+            layout="@layout/common_title_info"
+            android:layout_width="match_parent"
+            android:layout_height="65dp" />
+
+        <ScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/rl_head"
+            android:background="#f6f7f6"
+            android:focusable="false">
+
+            <com.mxsella.fatmuscle.view.percent.PercentRelativeLayout
+                android:id="@+id/rl_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#ffff">
+
+                <TextView
+                    android:id="@+id/tv_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="#434443"
+                    android:textSize="16dp"
+                    app:layout_marginTopPercent="5%h" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/rv"
+                    android:orientation="horizontal"
+                    app:layout_marginTopPercent="10%h">
+
+                    <TextView
+                        android:id="@+id/max_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="40dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="40dp"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:textColor="@color/grey_low"
+                        android:textSize="14dp" />
+
+                    <TextView
+                        android:id="@+id/min_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginLeft="40dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="40dp"
+                        android:layout_weight="1"
+                        android:gravity="left"
+                        android:textColor="@color/grey_low"
+                        android:textSize="14dp" />
+                </LinearLayout>
+
+                <com.mxsella.fatmuscle.view.percent.PercentRelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/app_main_measure_bitmap_bg"
+                    app:layout_marginTopPercent="20%h">
+
+                    <TextView
+                        android:id="@+id/bottom_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="15dp"
+                        android:text="@string/app_measure_resule_bottom_title"
+                        android:textColor="#999999"
+                        android:textSize="13dp" />
+
+                    <ImageView
+                        android:id="@+id/iv_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="237dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="48dp"
+                        android:layout_marginRight="36dp"
+                        android:scaleType="fitXY" />
+
+                    <com.mxsella.fatmuscle.view.MeasureView
+                        android:id="@+id/view_measure"
+                        android:layout_width="match_parent"
+                        android:layout_height="237dp"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="48dp"
+                        android:layout_marginRight="36dp"
+                        android:scaleType="fitXY" />
+
+                    <com.mxsella.fatmuscle.view.MeasureDividingRuleView
+                        android:id="@+id/view_dividing_rule"
+                        android:layout_width="35dp"
+                        android:layout_height="237dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginLeft="0dp"
+                        android:layout_marginTop="48dp"
+                        android:layout_marginRight="1dp" />
+
+                    <TextView
+                        android:id="@+id/comparison"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/iv_image"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="45dp"
+                        android:text="@string/app_measure_resule_bottom_comparison"
+                        android:textColor="#999999"
+                        android:textSize="14dp" />
+
+                    <com.mxsella.fatmuscle.view.widget.FatStandardView
+                        android:id="@+id/fat_thiness"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_below="@+id/comparison"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="10dp" />
+                </com.mxsella.fatmuscle.view.percent.PercentRelativeLayout>
+            </com.mxsella.fatmuscle.view.percent.PercentRelativeLayout>
+        </ScrollView>
+    </com.mxsella.fatmuscle.view.percent.PercentRelativeLayout>
+</layout>

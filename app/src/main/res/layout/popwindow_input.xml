@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#f3f3f3"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorWhite">
+
+        <TextView
+            android:id="@+id/ipt_quxiao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:padding="10dp"
+            android:text="取消"
+            android:textColor="@color/edit_black_color"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/ipt_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:padding="10dp"
+            android:text="图片"
+            android:textColor="@color/colorPrimary"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/ipt_fabu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:padding="10dp"
+            android:text="发布"
+            android:textColor="@color/edit_black_color"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+        <ImageView
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@mipmap/log_content_bg"
+            android:visibility="gone" />
+
+        <EditText
+            android:id="@+id/ipt_edit"
+            android:layout_width="match_parent"
+            android:layout_height="85dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@null"
+            android:gravity="top"
+            android:hint="小宝宝快长大..."
+            android:textColor="@color/edit_black_color"
+            android:textColorHint="#999999"
+            android:textSize="14sp" />
+    </RelativeLayout>
+</LinearLayout>

@@ -2,33 +2,50 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" /> <!-- Required to maintain app compatibility. -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
-
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 
     <application
-        android:name="com.cw.fatmuscle.common.MyApplication"
+        android:name="com.mxsella.fatmuscle.common.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Base.Theme.Fatmuscle"
         tools:targetApi="31">
         <activity
-            android:name="com.cw.fatmuscle.ui.activity.MuscleMeasureResultActivity"
+            android:name="com.mxsella.fatmuscle.ui.activity.HostActivity"
             android:exported="false" />
         <activity
-            android:name="com.cw.fatmuscle.MainActivity"
+            android:name="com.mxsella.fatmuscle.ui.activity.HistoryRecordActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.mxsella.fatmuscle.ui.activity.HistoryListActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.mxsella.fatmuscle.ui.activity.MuscleMeasureResultActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.mxsella.fatmuscle.ui.activity.OpenCvTest"
+            android:exported="false" />
+        <activity
+            android:name="com.mxsella.fatmuscle.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,8 +54,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.cw.fatmuscle.ui.activity.FatMeasurePlusActivity"
-            android:exported="true"></activity>
+            android:name="com.mxsella.fatmuscle.ui.activity.FatMeasurePlusActivity"
+            android:exported="true" />
+        <!-- 告知 XXPermissions 当前项目已经适配了分区存储特性 -->
+        <meta-data
+            android:name="ScopedStorage"
+            android:value="true" />
+
+        <meta-data
+            android:name="design_width_in_dp"
+            android:value="375" />
     </application>
 
 </manifest>
