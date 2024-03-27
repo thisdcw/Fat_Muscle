@@ -1,5 +1,6 @@
 package com.mxsella.fatmuscle.sdk.fat.manager;
 
+import android.Manifest;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,9 +13,12 @@ import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 
+import com.mxsella.fatmuscle.MainActivity;
 import com.mxsella.fatmuscle.common.Config;
+import com.mxsella.fatmuscle.common.MyApplication;
 import com.mxsella.fatmuscle.sdk.common.Constant;
 import com.mxsella.fatmuscle.sdk.fat.entity.BitmapMsg;
 import com.mxsella.fatmuscle.sdk.fat.entity.DeviceMsg;
@@ -63,36 +67,102 @@ public class OTGManager implements IDataTransfer {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             Log.i(TAG, "onReceive: " + action);
-            if (OTGManager.ACTION_USB_PERMISSION.equals(action)) {
+            if (ACTION_USB_PERMISSION.equals(action)) {
                 synchronized (this) {
                     Log.i(TAG, "onReceive: 111111111111");
-                    UsbDevice usbDevice = (UsbDevice) intent.getParcelableExtra("device");
-                    LogUtil.i("device -> " + usbDevice.getDeviceName());
-                    if (intent.getBooleanExtra("permission", false)) {
+                    UsbDevice usbDevice = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+//                    UsbDevice usbDevice = MainActivity.usbDevice;
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                         LogUtil.i("-> 1111");
                         if (usbDevice.getVendorId() == Config.VENDOR_ID && usbDevice.getProductId() == Config.PRODUCT_Id) {
                             LogUtil.i("-> 1112");
                             OTGManager.this.usbDevice = usbDevice;
                         }
-                        findInterface();
+                        findInterface(usbDevice);
                         start();
                     }
                 }
             }
         }
     };
+
+    public void sendFimware(DeviceMsg deviceMsg) {
+        if (this.isRunning) {
+            this.fimwareQueue.add(deviceMsg);
+            return;
+        }
+        DataTransListerner dataTransListerner = this.mDataTransListerner;
+        if (dataTransListerner != null) {
+            dataTransListerner.onCmdMessage(deviceMsg.getMsgId(), new byte[4], 1, DataTransListerner.ProtocolType.OTG);
+        }
+    }
+
+    public void findInterface(UsbDevice device) {
+        UsbDevice usbDevice = device;
+        if (usbDevice == null) {
+            return;
+        }
+        if (usbDevice.getInterfaceCount() > 0) {
+            UsbInterface usbInterface = this.usbDevice.getInterface(0);
+            this.usbInterface = usbInterface;
+            Log.i(TAG, "22" + usbInterface.toString());
+        }
+        getEndpoint(this.usbInterface);
+        if (this.usbInterface != null) {
+            Log.i(TAG, "usbInterface not null == " + (usbDevice == null ? "null -> " : "not null -> ") + usbManager.hasPermission(usbDevice));
+            HashMap<String, UsbDevice> deviceList1 = usbManager.getDeviceList();
+            for (int i = 0; i < deviceList1.size(); i++) {
+                UsbDevice usbDevice1 = deviceList1.get(i);
+                System.out.println("device => " + usbDevice1);
+            }
+            if (usbManager.hasPermission(usbDevice)) {
+                Log.i(TAG, "已经获得权限");
+                UsbDeviceConnection openDevice = this.usbManager.openDevice(usbDevice);
+                boolean b = openDevice.claimInterface(this.usbInterface, true);
+                Log.i(TAG, "打开设备" + (openDevice != null ? "true" : "false") + " claimInterface-> " + b);
+                if (openDevice == null) {
+                    Log.i(TAG, "设备连接为空");
+                } else if (openDevice != null && openDevice.claimInterface(this.usbInterface, true)) {
+                    this.deviceConnection = openDevice;
+                    Log.i(TAG, "连接状态-> " + (openDevice != null ? "true" : "false"));
+                } else {
+                    Log.i(TAG, "关闭连接 ");
+                    openDevice.close();
+                }
+            } else if (isRequestPermission) {
+                Log.d(TAG, "已经请求权限");
+            } else {
+                Log.d(TAG, "请求权限");
+                isRequestPermission = true;
+                this.usbManager.requestPermission(this.usbDevice, this.intent);
+            }
+        }
+    }
+
     private boolean isSendFirmwareData = false;
 
     public void setOTGManagerListerner(DataTransListerner dataTransListerner) {
         this.mDataTransListerner = dataTransListerner;
     }
 
+    public void setSendFirmwareData(boolean z) {
+        this.isSendFirmwareData = z;
+        if (z) {
+            return;
+        }
+        this.fimwareQueue.clear();
+    }
+
     public OTGManager(Context context) {
         this.mContext = context;
-        this.intent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
+        this.intent = PendingIntent.getBroadcast(MyApplication.getInstance(), 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_USB_PERMISSION);
+        intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         context.registerReceiver(this.mUsbReceiver, intentFilter);
+
     }
 
     public void send(DeviceMsg deviceMsg) {
@@ -107,6 +177,7 @@ public class OTGManager implements IDataTransfer {
     }
 
     public void send(int i, int i2) {
+        LogUtil.d("不添加数据数组");
         DeviceMsg deviceMsg = new DeviceMsg();
         deviceMsg.setMsgId(i);
         deviceMsg.setContent(i2);
@@ -114,47 +185,13 @@ public class OTGManager implements IDataTransfer {
     }
 
     public void send(int i, byte[] bArr) {
+        LogUtil.d("添加数据数组");
         DeviceMsg deviceMsg = new DeviceMsg();
         deviceMsg.setMsgId(i);
         deviceMsg.setContentArray(bArr);
         send(deviceMsg);
     }
 
-    public void findInterface() {
-        UsbDevice usbDevice = this.usbDevice;
-        if (usbDevice == null) {
-            return;
-        }
-        if (usbDevice.getInterfaceCount() > 0) {
-            UsbInterface usbInterface = this.usbDevice.getInterface(0);
-            this.usbInterface = usbInterface;
-            Log.i(TAG, "22" + usbInterface.toString());
-        }
-        getEndpoint(this.usbInterface);
-        if (this.usbInterface != null) {
-            Log.i(TAG, "usbInterface not null");
-            if (this.usbManager.hasPermission(this.usbDevice)) {
-                Log.i(TAG, "已经获得权限");
-                UsbDeviceConnection openDevice = this.usbManager.openDevice(this.usbDevice);
-                Log.i(TAG, "openDevice-> " + openDevice == null ? "true" : "false");
-                if (openDevice == null) {
-                    Log.i(TAG, "设备连接为空");
-                } else if (openDevice != null && openDevice.claimInterface(this.usbInterface, true)) {
-                    this.deviceConnection = openDevice;
-                    Log.i(TAG, "连接状态-> " + openDevice != null ? "false" : "true");
-                } else {
-                    openDevice.close();
-                }
-            } else if (this.isRequestPermission) {
-                Log.i(TAG, "已经请求权限");
-
-            } else {
-                Log.i(TAG, "请求权限");
-                this.isRequestPermission = true;
-                this.usbManager.requestPermission(this.usbDevice, this.intent);
-            }
-        }
-    }
 
     private void getEndpoint(UsbInterface usbInterface) {
         Log.i(TAG, "getEndpoint1: " + usbInterface.getEndpointCount());
@@ -174,8 +211,9 @@ public class OTGManager implements IDataTransfer {
     }
 
     public boolean start() {
-        LogUtil.i("开始");
+        LogUtil.i("开始" + isRunning + "连接状态 -> " + (deviceConnection == null ? "null" : "not null"));
         if (!this.isRunning && this.deviceConnection != null) {
+            LogUtil.d("非运行状态已连接");
             SendThread sendThread = this.mSendThread;
             if (sendThread != null && sendThread.isRunning) {
                 this.mSendThread.close();
@@ -185,19 +223,22 @@ public class OTGManager implements IDataTransfer {
             if (receiveThread != null && receiveThread.isRunning) {
                 this.mReceiveThread.close();
             }
-            this.mReceiveThread = new ReceiveThread(this);
+            this.mReceiveThread = new ReceiveThread();
             this.isRunning = true;
             this.mSendThread.start();
             this.mReceiveThread.start();
         }
         if (this.isRunning) {
+            LogUtil.d("运行状态");
             DataTransListerner dataTransListerner = this.mDataTransListerner;
             if (dataTransListerner != null) {
                 dataTransListerner.onCmdMessage(Constant.DEVICE_CONNECTED_MSG_ID, new byte[0], 0, DataTransListerner.ProtocolType.OTG);
             }
         } else {
+            LogUtil.d("非运行状态");
             DataTransListerner dataTransListerner2 = this.mDataTransListerner;
             if (dataTransListerner2 != null) {
+                LogUtil.d("dataTransListerner2 != null");
                 dataTransListerner2.onCmdMessage(-1, new byte[0], 0, DataTransListerner.ProtocolType.OTG);
             }
         }
@@ -224,11 +265,6 @@ public class OTGManager implements IDataTransfer {
         int bulkTransfer = this.deviceConnection.bulkTransfer(this.usbEpOut, protocolBytes, protocolBytes.length, 3000);
         Log.i(TAG, "sendDatas: result:" + bulkTransfer);
         return bulkTransfer > 0;
-    }
-
-    static long getTime(OTGManager otgManager, long time) {
-        otgManager.currentTime = time;
-        return time;
     }
 
     static UsbDeviceConnection getConnection(OTGManager otgManager) {
@@ -259,10 +295,7 @@ public class OTGManager implements IDataTransfer {
     private class ReceiveThread extends Thread {
         private boolean isRunning;
 
-        final OTGManager otgManager;
-
-        private ReceiveThread(OTGManager otgManager) {
-            this.otgManager = otgManager;
+        private ReceiveThread() {
             this.isRunning = true;
         }
 
@@ -278,8 +311,10 @@ public class OTGManager implements IDataTransfer {
                     byte[] bArr = new byte[512];
                     while (this.isRunning) {
                         int i = 2;
-                        if (OTGManager.getConnection(this.otgManager).bulkTransfer(OTGManager.getUsbEpIn(this.otgManager), bArr, 512, 3000) > 2) {
-                            OTGManager.getTime(this.otgManager, SystemClock.uptimeMillis());
+                        int i1 = deviceConnection.bulkTransfer(usbEpIn, bArr, 512, 3000);
+//                        LogUtil.d("读取otg 设备数据 => " + Arrays.toString(bArr) + "数据长度" + i1);
+                        if (i1 > 0) {
+                            currentTime = SystemClock.uptimeMillis();
                             if (ByteUtil.getIntByShort(bArr, 2) == 9188 && ByteUtil.getIntByShort(bArr, 4) == 4261) {
                                 byte[] bArr2 = new byte[496];
                                 System.arraycopy(bArr, 13, bArr2, 0, 496);
@@ -293,9 +328,9 @@ public class OTGManager implements IDataTransfer {
                                     state = BitmapMsg.State.END;
                                 }
                                 LogUtil.e("-->1");
-                                if (OTGManager.setDataTransListerner(this.otgManager) != null) {
+                                if (mDataTransListerner != null) {
                                     LogUtil.e("-->2");
-                                    OTGManager.setDataTransListerner(this.otgManager).onImageData(bArr2, state, DataTransListerner.ProtocolType.OTG);
+                                    mDataTransListerner.onImageData(bArr2, state, DataTransListerner.ProtocolType.OTG);
                                 }
                             } else if (ByteUtil.getIntByShort(bArr, 2) == 9188 && ByteUtil.getIntByShort(bArr, 4) == 4277 && MxsellaDeviceManager.getInstance().getDeviceVersion() < 20) {
                                 if (bArr[8] == 0) {
@@ -304,18 +339,18 @@ public class OTGManager implements IDataTransfer {
                                             if ((bArr[18] & 255) == 85) {
                                                 i = 3;
                                             }
-                                            LogUtil.i("=====================Receive=fimwareCurrentSize=" + OTGManager.setFirmwareCurrentSize(this.otgManager) + " error=" + i);
-                                            OTGManager.getFlag(this.otgManager, true);
+                                            LogUtil.i("=====================Receive=fimwareCurrentSize=" + fimwareCurrentSize + " error=" + i);
+                                            isFimwareFlag = true;
                                             int intByShort = ByteUtil.getIntByShort(bArr, 4);
                                             byte[] bArr3 = new byte[1];
-                                            if (OTGManager.getFirmWareAllSize(this.otgManager) > 0) {
+                                            if (fimwareAllSize > 0) {
                                                 LogUtil.e("-->3");
-                                                bArr3[0] = (byte) ((OTGManager.setFirmwareCurrentSize(this.otgManager) * 100) / OTGManager.getFirmWareAllSize(this.otgManager));
+                                                bArr3[0] = (byte) ((fimwareCurrentSize * 100) / fimwareAllSize);
                                             }
-                                            if (OTGManager.setDataTransListerner(this.otgManager) != null) {
+                                            if (mDataTransListerner != null) {
                                                 LogUtil.e("-->4");
                                                 LogUtil.i("======Receive=onCmdMessage=" + Arrays.toString(bArr3) + " error=" + i);
-                                                OTGManager.setDataTransListerner(this.otgManager).onCmdMessage(intByShort, bArr3, i, DataTransListerner.ProtocolType.OTG);
+                                                mDataTransListerner.onCmdMessage(intByShort, bArr3, i, DataTransListerner.ProtocolType.OTG);
                                             }
                                         }
                                     }
@@ -341,10 +376,10 @@ public class OTGManager implements IDataTransfer {
                                 Log.i("OTGManager", "receiveCmd: msgId:" + Integer.toHexString(intByShort2) + " length:" + intByShort3);
                                 byte[] bArr4 = new byte[intByShort3];
                                 System.arraycopy(bArr, 8, bArr4, 0, intByShort3);
-                                if (OTGManager.setDataTransListerner(this.otgManager) != null) {
+                                if (mDataTransListerner != null) {
                                     LogUtil.e("-->9");
                                     LogUtil.i("======Receive=onCmdMessage=" + Arrays.toString(bArr4) + " error=" + i);
-                                    OTGManager.setDataTransListerner(this.otgManager).onCmdMessage(intByShort2, bArr4, 0, DataTransListerner.ProtocolType.OTG);
+                                    mDataTransListerner.onCmdMessage(intByShort2, bArr4, 0, DataTransListerner.ProtocolType.OTG);
                                 }
                             }
                         }
@@ -353,11 +388,11 @@ public class OTGManager implements IDataTransfer {
                     close();
                     this.isRunning = false;
                     new DeviceMsg().setMsgId(-1);
-                    if (OTGManager.setDataTransListerner(this.otgManager) == null) {
+                    if (mDataTransListerner == null) {
                         LogUtil.e("-->11");
                         return;
                     }
-                    OTGManager.setDataTransListerner(this.otgManager).onCmdMessage(-1, new byte[0], 1, DataTransListerner.ProtocolType.OTG);
+                    mDataTransListerner.onCmdMessage(-1, new byte[0], 1, DataTransListerner.ProtocolType.OTG);
                 } catch (Exception e) {
                     LogUtil.e("-->12");
                     Log.e("OTGManager", "run: " + e.getMessage());
@@ -365,20 +400,20 @@ public class OTGManager implements IDataTransfer {
                     close();
                     this.isRunning = false;
                     new DeviceMsg().setMsgId(-1);
-                    if (OTGManager.setDataTransListerner(this.otgManager) == null) {
+                    if (mDataTransListerner == null) {
                         LogUtil.e("-->15");
                         return;
                     }
-                    OTGManager.setDataTransListerner(this.otgManager).onCmdMessage(-1, new byte[0], 1, DataTransListerner.ProtocolType.OTG);
+                    mDataTransListerner.onCmdMessage(-1, new byte[0], 1, DataTransListerner.ProtocolType.OTG);
                 }
             } catch (Throwable th) {
                 close();
                 LogUtil.e("-->13");
                 this.isRunning = false;
                 new DeviceMsg().setMsgId(-1);
-                if (OTGManager.setDataTransListerner(this.otgManager) != null) {
+                if (mDataTransListerner != null) {
                     LogUtil.e("-->14");
-                    OTGManager.setDataTransListerner(this.otgManager).onCmdMessage(-1, new byte[0], 1, DataTransListerner.ProtocolType.OTG);
+                    mDataTransListerner.onCmdMessage(-1, new byte[0], 1, DataTransListerner.ProtocolType.OTG);
                 }
                 throw th;
             }
@@ -420,11 +455,14 @@ public class OTGManager implements IDataTransfer {
                             sendDatas(deviceMsg);
                         }
                     } else {
+
                         Log.i(TAG, "run: send error");
+                        return;
                     }
                     i++;
                     if (i > 3) {
                         if (!checkIsConnectDevice()) {
+                            LogUtil.d("未连接关闭");
                             closeSession();
                         }
                         i = 0;
@@ -519,6 +557,7 @@ public class OTGManager implements IDataTransfer {
         for (UsbDevice usbDevice : deviceList.values()) {
             if (usbDevice.getVendorId() == 1027 && usbDevice.getProductId() == 24596) {
                 this.usbDevice = usbDevice;
+                LogUtil.d("已有权限设备"+usbDevice.toString());
             }
         }
         return this.usbDevice != null;
@@ -529,7 +568,9 @@ public class OTGManager implements IDataTransfer {
     }
 
     public boolean initUsbDevice() {
-        UsbManager usbManager = (UsbManager) this.mContext.getSystemService(Context.USB_SERVICE);
+
+        UsbManager usbManager = (UsbManager) MyApplication.getInstance().getSystemService(Context.USB_SERVICE);
+
         this.usbManager = usbManager;
         HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
         this.deviceList = deviceList;
@@ -540,7 +581,7 @@ public class OTGManager implements IDataTransfer {
                 this.usbDevice = usbDevice;
             }
         }
-        findInterface();
+        findInterface(usbDevice);
         return start();
     }
 }

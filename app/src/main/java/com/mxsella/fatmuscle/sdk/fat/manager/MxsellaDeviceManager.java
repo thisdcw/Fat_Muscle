@@ -59,12 +59,6 @@ public class MxsellaDeviceManager implements DataTransListerner {
     private int ocxo = 32;
     private ConcurrentHashMap<Object, DeviceResultInterface> interfaceHashMap = new ConcurrentHashMap<>();
     private boolean isEnd = false;
-    private MyDataListener myDataListener = new MyDataListener() {
-        @Override
-        public void onMessage(DeviceMsg deviceMsg) {
-            LogUtil.i("my data -> "+deviceMsg.toString());
-        }
-    };
     BitmapMsg bitmapMsg = null;
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -75,13 +69,13 @@ public class MxsellaDeviceManager implements DataTransListerner {
                 return;
             }
             if (intent.getAction().equals(MxsellaDeviceManager.ACTION_USB_DETACHED_PERMISSION)) {
-                if (mOTGManager.isConnect()) {
+                if (MxsellaDeviceManager.this.mOTGManager.isConnect()) {
                     Log.d(TAG, "OTG 已经断开连接");
                     disConnectDevice();
                 }
-            } else if (!intent.getAction().equals(MxsellaDeviceManager.ACTION_USB_DEVICE_ATTACHED) || mOTGManager.isConnect()) {
+            } else if (!intent.getAction().equals(MxsellaDeviceManager.ACTION_USB_DEVICE_ATTACHED) || MxsellaDeviceManager.this.mOTGManager.isConnect()) {
                 Log.d(TAG, "不是USB设备,或者OTG已经连接");
-            } else {
+            } else if (intent.getAction().equals(MxsellaDeviceManager.ACTION_USB_DEVICE_ATTACHED)) {
                 Log.d(TAG, "OTG 连接设备");
                 connectDevice();
             }
@@ -133,16 +127,18 @@ public class MxsellaDeviceManager implements DataTransListerner {
         if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_VERSION)) {
             if (this.mOTGManager.isConnect()) {
                 sendCmd(Constant.DEVICE_VERSION, 0);
+            } else if (checkDeviceConnectStatus(deviceResultInterface, 432)) {
+                sendCmd(432, -1);
             }
         }
     }
 
     public void setDeviceDepth(int i, DeviceResultInterface deviceResultInterface) {
         if (checkDeviceConnectStatus(deviceResultInterface, MxsellaConstant.DEVICE_DLPF_M_VALUE)) {
+            LogUtil.d("i=>" + i);
             sendCmd(MxsellaConstant.DEVICE_DLPF_M_VALUE, i);
             if (1 == this.curDeviceCode) {
                 int i2 = (i * BitmapUtil.sBitmapHight * 2) + 165 + 24;
-
                 sendCmd(MxsellaConstant.DEVICE_RXATE_DELAY, new byte[]{0, -91, (byte) ((i2 >> 8) & 255), (byte) (i2 & 255)});
             }
         }
@@ -358,7 +354,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
 
     public void notityMessage(DeviceMsg deviceMsg) {
         EventBus.getDefault().post(deviceMsg);
-        myDataListener.onMessage(deviceMsg);
+//        myDataListener.onMessage(deviceMsg);
     }
 
     public void setDeviceIdentification(String str) {
@@ -392,8 +388,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
         this.deviceVersion = SharedPreferencesUtil.getInt(this.mContext, DATA_DEVICE_VERSION_KEY, this.deviceVersion);
         this.flashId = SharedPreferencesUtil.getString(this.mContext, DATA_DEVICE_FLASH_KEY, this.flashId);
         this.blueSpeedRateLeve = SharedPreferencesUtil.getInt(this.mContext, DATA_DEVICE_DATA_RATE_KEY, this.blueSpeedRateLeve);
-        int i = SharedPreferencesUtil.getInt(this.mContext, CUR_SEL_DEVICE_CODE, -1);
-        this.curDeviceCode = i;
+        this.curDeviceCode = 0;
         BitmapUtil.sBitmapHight = OTGManager.BITMAP_WIDTH;
     }
 
@@ -408,6 +403,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
 
     @Override
     public void onCmdMessage(int i, byte[] bArr, int i2, DataTransListerner.ProtocolType protocolType) {
+        LogUtil.d("i => " + i);
         if (i != -1) {
             if (i != 432) {
                 if (i != 4277) {
@@ -418,6 +414,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
                             DeviceMsg deviceMsg = new DeviceMsg();
                             deviceMsg.setMsgId(i);
                             deviceMsg.setProtocolType(protocolType);
+                            LogUtil.d("连接状态" + deviceMsg.toString());
                             notityMessage(deviceMsg);
                             return;
                         } else if (i != 4272) {
@@ -490,6 +487,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
 
     @Override
     public void onImageData(byte[] bArr, BitmapMsg.State state, ProtocolType protocolType) {
+        LogUtil.d("图像数据");
         if (this.isEnd && state == BitmapMsg.State.RUN) {
             return;
         }

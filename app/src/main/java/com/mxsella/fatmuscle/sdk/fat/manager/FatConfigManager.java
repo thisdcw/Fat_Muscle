@@ -71,11 +71,12 @@ public class FatConfigManager {
     }
 
     public boolean isAutoMeasure() {
-        return this.isAutoMeasure || !MxsellaDeviceManager.getInstance().isToBusinessVersion();
+        return true;
     }
 
     public void setAutoMeasure(boolean z) {
         this.isAutoMeasure = z;
+        Config.saveBoolean(this.mContext, MxsellaConstant.AUTO_MEASURE_MODE, z);
     }
 
     public boolean isReLoadData() {
@@ -94,7 +95,6 @@ public class FatConfigManager {
         this.defaultRssiValue = i;
     }
 
-    /* loaded from: classes.dex */
     public enum UNIT {
         CM(0),
         IN(1),
@@ -186,7 +186,7 @@ public class FatConfigManager {
                     bodyParts.setTabIndex(2);
                     bodyParts.setMusclePartTip(Integer.valueOf(R.string.getj));
                     bodyParts.setMusclePartIcon(Integer.valueOf(R.drawable.gongertouji_icon));
-                   break;
+                    break;
                 case 3:
                     if (z2) {
                         bodyParts.setName(this.mContext.getString(R.string.tui_text));
@@ -466,17 +466,13 @@ public class FatConfigManager {
 
     public ConfigParameter getConfigParameter(int i) {
         if (this.configParameterList == null) {
-            Log.d("FatConfigManager ", " == null");
             return null;
         }
         for (ConfigParameter configParameter : this.configParameterList) {
-            Log.d("FatConfigManager ", " 遍历");
             if (configParameter.getDataLength() == i) {
-                Log.d("FatConfigManager ", " == i");
                 return configParameter;
             }
         }
-        Log.d("FatConfigManager ", " == null");
         return null;
     }
 

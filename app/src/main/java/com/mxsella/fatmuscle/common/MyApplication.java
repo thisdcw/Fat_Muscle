@@ -3,6 +3,7 @@ package com.mxsella.fatmuscle.common;
 import android.app.Application;
 
 import com.mxsella.fatmuscle.db.AppDatabase;
+import com.mxsella.fatmuscle.sdk.common.MxsellaConstant;
 import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
 import com.mxsella.fatmuscle.sdk.sproutcameramedical.USL;
 import com.mxsella.fatmuscle.utils.LogUtil;
@@ -27,13 +28,19 @@ public class MyApplication extends Application {
         }
     };
 
-
+    private void initDir() {
+        MxsellaConstant.APP_DIR_PATH = getExternalCacheDir().getPath();
+        MxsellaConstant.CACH_PHONE_MIDIR = MxsellaConstant.APP_DIR_PATH + "/icon";
+        MxsellaConstant.ICON = MxsellaConstant.CACH_PHONE_MIDIR + "/temp.jpeg";
+        MxsellaConstant.ICON_TEMP = MxsellaConstant.CACH_PHONE_MIDIR + "/temp01.jpeg";
+    }
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
         FatConfigManager.getInstance().init(instance);
         initOpenCV();
+        initDir();
         USL usl = USL.getUslInstance();
 
         db = AppDatabase.getInstance(instance);

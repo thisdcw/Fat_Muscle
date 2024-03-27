@@ -16,17 +16,8 @@ public class NoticeManager {
 
     private static Object obj = new Object();
     private static NoticeManager sNoticeManager;
-    private List<DeviceInterface> deviceInterfaces = new ArrayList();
-    MxsellaDeviceManager mMarvotoDeviceManager;
-
-    /* loaded from: classes.dex */
-    public interface DeviceInterface {
-        void onConnected();
-
-        void onDisconnected(int i, String str);
-
-        void onMessage(DeviceMsg deviceMsg);
-    }
+    private List<MxsellaDeviceManager.DeviceInterface> deviceInterfaces = new ArrayList<>();
+    MxsellaDeviceManager mMxsellaDeviceManager;
 
     public static NoticeManager getInstance() {
         if (sNoticeManager == null) {
@@ -43,11 +34,11 @@ public class NoticeManager {
         EventBus.getDefault().register(this);
     }
 
-    public void registerDeviceInterface(DeviceInterface deviceInterface) {
+    public void registerDeviceInterface(MxsellaDeviceManager.DeviceInterface deviceInterface) {
         this.deviceInterfaces.add(deviceInterface);
     }
 
-    public void unregisterDeviceInterface(DeviceInterface deviceInterface) {
+    public void unregisterDeviceInterface(MxsellaDeviceManager.DeviceInterface deviceInterface) {
         this.deviceInterfaces.remove(deviceInterface);
     }
 
@@ -65,7 +56,7 @@ public class NoticeManager {
         if (msgId == -1 || msgId == 34952) {
             return;
         }
-        for (DeviceInterface deviceInterface : this.deviceInterfaces) {
+        for (MxsellaDeviceManager.DeviceInterface deviceInterface : this.deviceInterfaces) {
             Log.i("message => ", deviceMsg.toString());
             deviceInterface.onMessage(deviceMsg);
         }

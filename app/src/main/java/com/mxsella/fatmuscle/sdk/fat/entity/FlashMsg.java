@@ -1,6 +1,7 @@
 package com.mxsella.fatmuscle.sdk.fat.entity;
 
 import com.mxsella.fatmuscle.utils.ByteUtil;
+import com.mxsella.fatmuscle.utils.LogUtil;
 
 public class FlashMsg extends DeviceMsg {
     private String mfid;
@@ -24,6 +25,7 @@ public class FlashMsg extends DeviceMsg {
 
     @Override
     public void unpack(byte[] bArr) {
+        LogUtil.d("flash解包");
         String bytesToHex;
         if (bArr == null || (bytesToHex = String.valueOf(ByteUtil.bytesToHex(bArr))) == null || bytesToHex.length() <= 10) {
             return;

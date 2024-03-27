@@ -25,6 +25,7 @@ import com.mxsella.fatmuscle.sdk.fat.entity.DeviceMsg;
 import com.mxsella.fatmuscle.db.bean.FatRecord;
 import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
 import com.mxsella.fatmuscle.sdk.fat.manager.MxsellaDeviceManager;
+import com.mxsella.fatmuscle.sdk.fat.manager.NoticeManager;
 import com.mxsella.fatmuscle.sdk.fat.utils.AnrWatchDog;
 import com.mxsella.fatmuscle.sdk.fat.utils.BitmapUtil;
 import com.mxsella.fatmuscle.sdk.fat.utils.FileIOUtils;
@@ -95,7 +96,6 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
         fatMeasurePlusBinding = DataBindingUtil.setContentView(this, R.layout.activity_fat_measure_plus);
 
         MxsellaDeviceManager.getInstance().connectDevice();
-
         this.measureFailCount = 0;
         //TODO 状态条
 //        StatusBarUtil.setColor(this, -1, 5);
