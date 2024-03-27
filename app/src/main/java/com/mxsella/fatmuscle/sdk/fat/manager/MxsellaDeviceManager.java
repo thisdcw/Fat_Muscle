@@ -133,6 +133,16 @@ public class MxsellaDeviceManager implements DataTransListerner {
         }
     }
 
+    public void getFlashFileData(DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, 437)) {
+            if (this.mOTGManager.isConnect()) {
+                sendCmd(Constant.DEVICE_VERSION, 0);
+            } else if (checkDeviceConnectStatus(deviceResultInterface, 437)) {
+                sendCmd(437, -1);
+            }
+        }
+    }
+
     public void setDeviceDepth(int i, DeviceResultInterface deviceResultInterface) {
         if (checkDeviceConnectStatus(deviceResultInterface, MxsellaConstant.DEVICE_DLPF_M_VALUE)) {
             LogUtil.d("i=>" + i);
@@ -155,10 +165,93 @@ public class MxsellaDeviceManager implements DataTransListerner {
             this.mOTGManager.send(i, i2);
         }
     }
+    public void setDeviceSampleLen(int i, DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_SAMPLE_LEN)) {
+            sendCmd(Constant.DEVICE_SAMPLE_LEN, i);
+            int curDeviceDepth = (FatConfigManager.getInstance().getCurDeviceDepth() * i * 2) + 165 + 24;
+            sendCmd(Constant.DEVICE_RXATE_DELAY, new byte[]{0, -91, (byte) ((curDeviceDepth >> 8) & 255), (byte) (curDeviceDepth & 255)});
+        }
+    }
+
+    public void setDeviceTxWave(int i, DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_TX_WAVE)) {
+            sendCmd(Constant.DEVICE_TX_WAVE, i);
+        }
+    }
+
+    public void setDeviceCutPoint(int i, DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_CUT_POINTS)) {
+            sendCmd(Constant.DEVICE_CUT_POINTS, i);
+        }
+    }
+    public void setDeviceLineNum(int i, DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_LINE_NUM)) {
+            sendCmd(Constant.DEVICE_LINE_NUM, i);
+        }
+    }
+    public void setDevicePulseWidth(int i, DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_PULSE_WIDTH)) {
+            sendCmd(Constant.DEVICE_PULSE_WIDTH, i);
+        }
+    }
 
     private void sendCmd(int i, byte[] bArr) {
         if (this.mOTGManager.isConnect()) {
             this.mOTGManager.send(i, bArr);
+        }
+    }
+    public void setDeviceRxGate(byte[] bArr, DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_RXATE_DELAY)) {
+            sendCmd(Constant.DEVICE_RXATE_DELAY, bArr);
+        }
+    }
+    public void setDeviceFpgaSpiDma(int i, DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_FPGA_SPI_DMA)) {
+            sendCmd(Constant.DEVICE_FPGA_SPI_DMA, i);
+        }
+    }
+    public void setDeviceAdcConf(byte[] bArr, DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_ADC_CONF)) {
+            sendCmd(Constant.DEVICE_ADC_CONF, bArr);
+        }
+    }
+    public void setDeviceAfePowerCtrl(int i, DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_AFE_POWER_CTRL)) {
+            sendCmd(Constant.DEVICE_AFE_POWER_CTRL, i);
+        }
+    }
+    public void setBlueSpeedRateLeve(int i) {
+        this.blueSpeedRateLeve = i;
+        SharedPreferencesUtil.saveInt(this.mContext, DATA_DEVICE_DATA_RATE_KEY, i);
+    }
+
+    public void setDeviceTxDataRate(final int i, final DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus((z, obj2) -> {
+            if (z) {
+                MxsellaDeviceManager.this.setBlueSpeedRateLeve(i);
+            }
+            DeviceResultInterface deviceResultInterface2 = deviceResultInterface;
+            if (deviceResultInterface2 != null) {
+                deviceResultInterface2.result(z, obj2);
+            }
+        }, Constant.DEVICE_TXDATA_RATE)) {
+            sendCmd(Constant.DEVICE_TXDATA_RATE, i);
+        }
+    }
+    public void startUpgradeFirmware(DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_FIRMWARE_START)) {
+            sendCmd(Constant.DEVICE_FIRMWARE_START, 1);
+        }
+    }
+    public void restartFirmware(DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_FIRMWARE_RESTART)) {
+            sendCmd(Constant.DEVICE_FIRMWARE_RESTART, 1);
+        }
+    }
+
+    public void setDeviceLowPassFilter(byte[] bArr, DeviceResultInterface deviceResultInterface) {
+        if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_LOW_PASS_FILTER_COEFFICIENT)) {
+            sendCmd(Constant.DEVICE_LOW_PASS_FILTER_COEFFICIENT, bArr);
         }
     }
 
@@ -337,7 +430,6 @@ public class MxsellaDeviceManager implements DataTransListerner {
 
     public void setFlashId(String str) {
         this.flashId = str;
-        //TODO 本地保存 DATA_DEVICE_FLASH_KEY
         SharedPreferencesUtil.savaString(this.mContext, DATA_DEVICE_FLASH_KEY, str);
     }
 
@@ -348,24 +440,20 @@ public class MxsellaDeviceManager implements DataTransListerner {
 
     public void setDeviceMode(String str) {
         this.deviceMode = str;
-        //TODO 本地保存 DATA_DEVICE_MODE_KEY
         SharedPreferencesUtil.savaString(this.mContext, DATA_DEVICE_MODE_KEY, str);
     }
 
     public void notityMessage(DeviceMsg deviceMsg) {
         EventBus.getDefault().post(deviceMsg);
-//        myDataListener.onMessage(deviceMsg);
     }
 
     public void setDeviceIdentification(String str) {
         this.deviceIdentification = str;
-        //TODO 本地保存 DATA_DEVICE_NAME_KEY
         SharedPreferencesUtil.savaString(this.mContext, DATA_DEVICE_NAME_KEY, str);
     }
 
     public void setDeviceVersion(int i) {
         this.deviceVersion = i;
-        //TODO 本地保存 DATA_DEVICE_VERSION_KEY
         SharedPreferencesUtil.saveInt(this.mContext, DATA_DEVICE_VERSION_KEY, i);
     }
 

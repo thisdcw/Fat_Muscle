@@ -6,8 +6,7 @@ import com.fasterxml.jackson.dataformat.smile.SmileConstants;
 public class Constant {
     public static final int DEVICE_CONNECTED_MSG_ID = 34952;
     public static final int DEVICE_FIRMWARE_UPDATE = 4277;
-    public static int supportOnlyZ1OrZ2;
-
+    public static int supportOnlyZ1OrZ2 = 0;
     public static final int DEVICE_ADC_CONF = 4305;
     public static final int DEVICE_AFE_POWER_CTRL = 4306;
     public static final int DEVICE_BATTERY_MSG_ID = 30583;

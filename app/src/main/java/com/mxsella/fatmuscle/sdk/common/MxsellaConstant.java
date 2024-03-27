@@ -129,17 +129,9 @@ public class MxsellaConstant {
     public static boolean isProduct = false;
     public static boolean isSupportAutoSynCloud = true;
     public static boolean isSupportBlueFun = true;
-    public static int supportOnlyZ1OrZ2;
     public static String APP_DIR_PATH = Environment.getExternalStorageDirectory() + "/FatDetector";
     public static String CACH_PHONE_MIDIR = APP_DIR_PATH + "/icon";
     public static String ICON_TEMP = CACH_PHONE_MIDIR + "/temp01.jpeg";
-//    public static String sCOMMON_PROBLEM = "http://www.marvoto.com/marvotowebsite/index.php/qa_z1_en";
-//    public static String sCOMMON_PROBLEM_CN = "http://www.marvoto.com/cn/index.php/m1-2/";
-//    public static String Z2_sCOMMON_PROBLEM = "http://www.marvoto.com/marvotowebsite/index.php/qa-z2/";
-//    public static String Z2_sCOMMON_PROBLEM_CN = "http://www.marvoto.com/cn/index.php/z2/qaz2/";
-//    public static String URL_OTG_GUIDE_EN = "http://www.marvoto.com/marvotowebsite/index.php/otg-guideline/";
-//    public static String URL_OTG_GUIDE_CN = "http://www.marvoto.com/cn/index.php/otg-guideline/";
-//    public static String URL_OPEN_BOX_EN = "https://marvoto-hk.oss-cn-hongkong.aliyuncs.com/faq/z1_open_box_video.mp4";
 
     static {
         String str = Environment.getExternalStorageDirectory() + "/DCIM/Camera";
@@ -147,6 +139,4 @@ public class MxsellaConstant {
         ICON = str + "/temp.jpeg";
         IMAGEPATH = str + "/image";
     }
-
-
 }
