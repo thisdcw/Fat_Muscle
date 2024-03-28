@@ -14,9 +14,9 @@ import android.view.View;
 
 import com.mxsella.fat_muscle.R;
 import com.mxsella.fatmuscle.common.MyApplication;
-import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
-import com.mxsella.fatmuscle.sdk.fat.utils.MetricInchUnitUtil;
-import com.mxsella.fatmuscle.sdk.util.DensityUtil;
+import com.mxsella.fatmuscle.manager.FatConfigManager;
+import com.mxsella.fatmuscle.utils.MetricInchUnitUtil;
+import com.mxsella.fatmuscle.utils.DensityUtil;
 import com.mxsella.fatmuscle.utils.PaintUtil;
 
 public class ResultRoundView extends View {

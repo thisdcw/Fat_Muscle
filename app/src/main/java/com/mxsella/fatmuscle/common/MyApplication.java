@@ -3,9 +3,9 @@ package com.mxsella.fatmuscle.common;
 import android.app.Application;
 
 import com.mxsella.fatmuscle.db.AppDatabase;
-import com.mxsella.fatmuscle.sdk.common.MxsellaConstant;
-import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
-import com.mxsella.fatmuscle.sdk.sproutcameramedical.USL;
+import com.mxsella.fatmuscle.manager.FatConfigManager;
+import com.mxsella.fatmuscle.manager.MxsellaDeviceManager;
+import com.mxsella.fatmuscle.sdk.USL;
 import com.mxsella.fatmuscle.utils.LogUtil;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -34,6 +34,7 @@ public class MyApplication extends Application {
         MxsellaConstant.ICON = MxsellaConstant.CACH_PHONE_MIDIR + "/temp.jpeg";
         MxsellaConstant.ICON_TEMP = MxsellaConstant.CACH_PHONE_MIDIR + "/temp01.jpeg";
     }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -42,7 +43,7 @@ public class MyApplication extends Application {
         initOpenCV();
         initDir();
         USL usl = USL.getUslInstance();
-
+        usl.run();
         db = AppDatabase.getInstance(instance);
     }
 
@@ -52,6 +53,13 @@ public class MyApplication extends Application {
         } else {
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        //取消Eventbus订阅
+//        MxsellaDeviceManager.getInstance().unregisterEventbus();
     }
 
     public static MyApplication getInstance() {

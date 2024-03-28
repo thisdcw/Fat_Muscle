@@ -13,8 +13,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.databinding.DataBindingUtil;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -25,13 +23,12 @@ import com.mxsella.fat_muscle.databinding.ActivityHistoryRecordBinding;
 import com.mxsella.fatmuscle.common.MyApplication;
 import com.mxsella.fatmuscle.common.base.BaseActivity;
 import com.mxsella.fatmuscle.db.bean.FatRecord;
-import com.mxsella.fatmuscle.sdk.fat.entity.ApiMemberInfo;
-import com.mxsella.fatmuscle.sdk.fat.entity.BodyParts;
-import com.mxsella.fatmuscle.sdk.fat.entity.ShareData;
-import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
-import com.mxsella.fatmuscle.sdk.fat.utils.BitmapUtil;
-import com.mxsella.fatmuscle.sdk.fat.utils.MetricInchUnitUtil;
-import com.mxsella.fatmuscle.sdk.util.DensityUtil;
+import com.mxsella.fatmuscle.entity.ApiMemberInfo;
+import com.mxsella.fatmuscle.entity.BodyParts;
+import com.mxsella.fatmuscle.manager.FatConfigManager;
+import com.mxsella.fatmuscle.utils.BitmapUtil;
+import com.mxsella.fatmuscle.utils.MetricInchUnitUtil;
+import com.mxsella.fatmuscle.utils.DensityUtil;
 import com.mxsella.fatmuscle.utils.ArrayUtil;
 import com.mxsella.fatmuscle.view.MeasureDividingRuleView;
 import com.mxsella.fatmuscle.view.MeasureView;
@@ -59,7 +56,6 @@ public class HistoryRecordActivity extends BaseActivity<ActivityHistoryRecordBin
     private TextView minValueTv;
     int position;
     private FatRecord.TYPE recordType;
-    private ShareData shareData;
     TextView title;
     String bodyPosition = "0";
     float x = 0.0f;

@@ -5,14 +5,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 
-import androidx.databinding.DataBindingUtil;
-
 import com.mxsella.fat_muscle.R;
 import com.mxsella.fat_muscle.databinding.ActivityHistoryListBinding;
 import com.mxsella.fatmuscle.common.MyApplication;
 import com.mxsella.fatmuscle.common.base.BaseActivity;
 import com.mxsella.fatmuscle.db.bean.FatRecord;
-import com.mxsella.fatmuscle.sdk.util.ThreadUtils;
+import com.mxsella.fatmuscle.utils.ThreadUtils;
 import com.mxsella.fatmuscle.ui.adapter.HistoryListAdapter;
 
 import java.util.List;

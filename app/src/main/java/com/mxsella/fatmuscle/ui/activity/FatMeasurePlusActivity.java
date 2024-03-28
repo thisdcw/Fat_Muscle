@@ -2,7 +2,6 @@ package com.mxsella.fatmuscle.ui.activity;
 
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Handler;
@@ -13,41 +12,29 @@ import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import androidx.databinding.DataBindingUtil;
 
 import com.mxsella.fat_muscle.R;
 import com.mxsella.fat_muscle.databinding.ActivityFatMeasurePlusBinding;
 import com.mxsella.fatmuscle.common.MyApplication;
 import com.mxsella.fatmuscle.common.base.BaseActivity;
-import com.mxsella.fatmuscle.sdk.common.Constant;
-import com.mxsella.fatmuscle.sdk.common.MxsellaConstant;
-import com.mxsella.fatmuscle.sdk.fat.entity.BitmapMsg;
-import com.mxsella.fatmuscle.sdk.fat.entity.DeviceMsg;
+import com.mxsella.fatmuscle.common.Constant;
+import com.mxsella.fatmuscle.common.MxsellaConstant;
+import com.mxsella.fatmuscle.entity.BitmapMsg;
+import com.mxsella.fatmuscle.entity.DeviceMsg;
 import com.mxsella.fatmuscle.db.bean.FatRecord;
-import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
-import com.mxsella.fatmuscle.sdk.fat.manager.MxsellaDeviceManager;
-import com.mxsella.fatmuscle.sdk.fat.manager.NoticeManager;
-import com.mxsella.fatmuscle.sdk.fat.utils.AnrWatchDog;
-import com.mxsella.fatmuscle.sdk.fat.utils.BitmapUtil;
-import com.mxsella.fatmuscle.sdk.fat.utils.FileIOUtils;
-import com.mxsella.fatmuscle.sdk.fat.utils.MetricInchUnitUtil;
-import com.mxsella.fatmuscle.sdk.fat.utils.OpenCvMeasureUtil;
-import com.mxsella.fatmuscle.sdk.util.DensityUtil;
-import com.mxsella.fatmuscle.sdk.util.SystemParamUtil;
-import com.mxsella.fatmuscle.sdk.util.ThreadUtils;
-import com.mxsella.fatmuscle.sdk.util.ToastUtil;
+import com.mxsella.fatmuscle.manager.FatConfigManager;
+import com.mxsella.fatmuscle.manager.MxsellaDeviceManager;
+import com.mxsella.fatmuscle.utils.BitmapUtil;
+import com.mxsella.fatmuscle.utils.MetricInchUnitUtil;
+import com.mxsella.fatmuscle.utils.OpenCvMeasureUtil;
+import com.mxsella.fatmuscle.utils.DensityUtil;
+import com.mxsella.fatmuscle.utils.SystemParamUtil;
+import com.mxsella.fatmuscle.utils.ThreadUtils;
+import com.mxsella.fatmuscle.utils.ToastUtil;
 import com.mxsella.fatmuscle.utils.ArrayUtil;
 import com.mxsella.fatmuscle.utils.DateUtil;
 import com.mxsella.fatmuscle.view.CustomVideoView;
-import com.mxsella.fatmuscle.view.MeasureDividingRuleView;
-import com.mxsella.fatmuscle.view.MeasurePlusView;
 import com.mxsella.fatmuscle.view.dialog.DialogManager;
-import com.mxsella.fatmuscle.view.widget.FatStandardView;
-
-import java.util.Locale;
 
 public class FatMeasurePlusActivity extends BaseActivity<ActivityFatMeasurePlusBinding> implements MxsellaDeviceManager.DeviceInterface {
     private static final String TAG = "MuscleMeasureResultActivity";

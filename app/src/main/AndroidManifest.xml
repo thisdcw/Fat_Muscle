@@ -29,9 +29,6 @@
         android:theme="@style/Base.Theme.Fatmuscle"
         tools:targetApi="31">
         <activity
-            android:name="com.mxsella.fatmuscle.ui.activity.HostActivity"
-            android:exported="false" />
-        <activity
             android:name="com.mxsella.fatmuscle.ui.activity.HistoryRecordActivity"
             android:exported="false" />
         <activity
@@ -41,10 +38,7 @@
             android:name="com.mxsella.fatmuscle.ui.activity.MuscleMeasureResultActivity"
             android:exported="false" />
         <activity
-            android:name="com.mxsella.fatmuscle.ui.activity.OpenCvTest"
-            android:exported="false" />
-        <activity
-            android:name="com.mxsella.fatmuscle.MainActivity"
+            android:name="com.mxsella.fatmuscle.ui.activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -62,7 +56,6 @@
             android:name="com.mxsella.fatmuscle.ui.activity.FatMeasurePlusActivity"
             android:exported="true" />
 
-        <!-- 告知 XXPermissions 当前项目已经适配了分区存储特性 -->
         <meta-data
             android:name="ScopedStorage"
             android:value="true" />

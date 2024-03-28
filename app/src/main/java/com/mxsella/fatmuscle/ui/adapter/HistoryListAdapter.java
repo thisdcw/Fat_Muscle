@@ -13,8 +13,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.mxsella.fat_muscle.R;
 import com.mxsella.fatmuscle.db.bean.FatRecord;
-import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
-import com.mxsella.fatmuscle.sdk.fat.utils.MetricInchUnitUtil;
+import com.mxsella.fatmuscle.manager.FatConfigManager;
+import com.mxsella.fatmuscle.utils.MetricInchUnitUtil;
 
 import java.util.ArrayList;
 import java.util.List;

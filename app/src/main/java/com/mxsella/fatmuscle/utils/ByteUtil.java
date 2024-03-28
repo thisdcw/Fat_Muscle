@@ -1,7 +1,5 @@
 package com.mxsella.fatmuscle.utils;
 
-import com.mxsella.fatmuscle.sdk.util.ThreadUtils;
-
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

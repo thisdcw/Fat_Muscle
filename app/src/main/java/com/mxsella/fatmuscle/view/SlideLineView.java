@@ -14,12 +14,12 @@ import android.view.View;
 
 import androidx.core.view.InputDeviceCompat;
 
-import com.mxsella.fatmuscle.sdk.fat.entity.MeasureObj;
-import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
-import com.mxsella.fatmuscle.sdk.fat.manager.MxsellaDeviceManager;
-import com.mxsella.fatmuscle.sdk.fat.utils.BitmapUtil;
-import com.mxsella.fatmuscle.sdk.fat.utils.MetricInchUnitUtil;
-import com.mxsella.fatmuscle.sdk.util.DensityUtil;
+import com.mxsella.fatmuscle.entity.MeasureObj;
+import com.mxsella.fatmuscle.manager.FatConfigManager;
+import com.mxsella.fatmuscle.manager.MxsellaDeviceManager;
+import com.mxsella.fatmuscle.utils.BitmapUtil;
+import com.mxsella.fatmuscle.utils.MetricInchUnitUtil;
+import com.mxsella.fatmuscle.utils.DensityUtil;
 
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;

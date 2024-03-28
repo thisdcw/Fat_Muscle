@@ -14,33 +14,28 @@ import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.databinding.DataBindingUtil;
 
 import com.mxsella.fat_muscle.R;
 import com.mxsella.fat_muscle.databinding.ActivityMuscleMeasureResultBinding;
+import com.mxsella.fatmuscle.common.MxsellaConstant;
 import com.mxsella.fatmuscle.common.MyApplication;
 import com.mxsella.fatmuscle.common.base.BaseActivity;
 import com.mxsella.fatmuscle.db.bean.FatRecord;
-import com.mxsella.fatmuscle.sdk.common.MxsellaConstant;
-import com.mxsella.fatmuscle.sdk.fat.entity.BitmapMsg;
-import com.mxsella.fatmuscle.sdk.fat.entity.BodyParts;
-import com.mxsella.fatmuscle.sdk.fat.entity.DeviceMsg;
-import com.mxsella.fatmuscle.sdk.fat.entity.ShareData;
-import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
-import com.mxsella.fatmuscle.sdk.fat.manager.MxsellaDeviceManager;
-import com.mxsella.fatmuscle.sdk.fat.utils.AnrWatchDog;
-import com.mxsella.fatmuscle.sdk.fat.utils.BitmapUtil;
-import com.mxsella.fatmuscle.sdk.fat.utils.FileIOUtils;
-import com.mxsella.fatmuscle.sdk.util.SystemParamUtil;
-import com.mxsella.fatmuscle.sdk.util.ThreadUtils;
-import com.mxsella.fatmuscle.sdk.util.ToastUtil;
+import com.mxsella.fatmuscle.entity.BitmapMsg;
+import com.mxsella.fatmuscle.entity.BodyParts;
+import com.mxsella.fatmuscle.entity.DeviceMsg;
+import com.mxsella.fatmuscle.manager.FatConfigManager;
+import com.mxsella.fatmuscle.manager.MxsellaDeviceManager;
+import com.mxsella.fatmuscle.utils.BitmapUtil;
 import com.mxsella.fatmuscle.utils.DateUtil;
 import com.mxsella.fatmuscle.utils.LogUtil;
+import com.mxsella.fatmuscle.utils.SystemParamUtil;
+import com.mxsella.fatmuscle.utils.ThreadUtils;
+import com.mxsella.fatmuscle.utils.ToastUtil;
 import com.mxsella.fatmuscle.view.MeasureDividingRuleView;
 import com.mxsella.fatmuscle.view.MeasureView;
 import com.mxsella.fatmuscle.view.ResultRoundView;
 import com.mxsella.fatmuscle.view.SlideLineView;
-import com.mxsella.fatmuscle.view.dialog.CustomDialog;
 import com.mxsella.fatmuscle.view.widget.FlashHelper;
 
 public class MuscleMeasureResultActivity extends BaseActivity<ActivityMuscleMeasureResultBinding> implements View.OnClickListener, MxsellaDeviceManager.DeviceInterface, SlideLineView.MeasureListener {
@@ -48,7 +43,6 @@ public class MuscleMeasureResultActivity extends BaseActivity<ActivityMuscleMeas
     private static final int CLOSE_OPERATION_TIP = 4;
     private static final int DELAY = 1;
     private static final int START_FLASH_VIEW = 6;
-    AnrWatchDog anrWatchDog;
     private BodyParts curBodyPars;
     private Button lastBtn;
     private ImageView mIvBodyIcon;
@@ -65,8 +59,6 @@ public class MuscleMeasureResultActivity extends BaseActivity<ActivityMuscleMeas
     private MeasureDividingRuleView measureDividingRuleView;
     private RelativeLayout measureRoot;
     private Button nextBtn;
-    private ShareData shareData;
-    CustomDialog showOpenMeasureLineDialog;
     private boolean isSaveRecord = false;
     private String TAG = "MuscleMeasureResultActivity";
     private int count = 0;
@@ -161,9 +153,6 @@ public class MuscleMeasureResultActivity extends BaseActivity<ActivityMuscleMeas
         this.measureRoot = (RelativeLayout) findViewById(R.id.measure_root);
 
         MxsellaDeviceManager.getInstance().registerDeviceInterface(this);
-        AnrWatchDog build = new AnrWatchDog.Builder().timeout(30000).ignoreDebugger(true).anrListener(str -> FileIOUtils.writeFileFromString(MxsellaConstant.APP_DIR_PATH + "/anr/" + DateUtil.getDate2String(System.currentTimeMillis(), "MM_dd_HH_mm_ss") + ".txt", str)).build();
-        this.anrWatchDog = build;
-        build.start();
         this.measureDividingRuleView.setInit(this.mIvImage.getWidth(), this.mIvImage.getHeight(), FatConfigManager.getInstance().getCurDeviceDepth());
         if (FatConfigManager.getInstance().getCurBodyPositionIndex() == 1) {
             Log.d(TAG, "getCurBodyPositionIndex() == 1");

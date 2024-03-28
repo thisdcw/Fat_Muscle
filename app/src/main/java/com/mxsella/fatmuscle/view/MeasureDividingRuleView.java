@@ -9,10 +9,10 @@ import android.util.Log;
 import android.view.View;
 
 import com.mxsella.fat_muscle.R;
-import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
-import com.mxsella.fatmuscle.sdk.fat.manager.MxsellaDeviceManager;
-import com.mxsella.fatmuscle.sdk.fat.utils.BitmapUtil;
-import com.mxsella.fatmuscle.sdk.fat.utils.MetricInchUnitUtil;
+import com.mxsella.fatmuscle.manager.FatConfigManager;
+import com.mxsella.fatmuscle.manager.MxsellaDeviceManager;
+import com.mxsella.fatmuscle.utils.BitmapUtil;
+import com.mxsella.fatmuscle.utils.MetricInchUnitUtil;
 import com.mxsella.fatmuscle.utils.PaintUtil;
 
 public class MeasureDividingRuleView extends View {

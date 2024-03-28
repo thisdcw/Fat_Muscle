@@ -12,8 +12,8 @@ import android.view.View;
 
 import com.mxsella.fat_muscle.R;
 import com.mxsella.fatmuscle.common.MyApplication;
-import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
-import com.mxsella.fatmuscle.sdk.fat.utils.MetricInchUnitUtil;
+import com.mxsella.fatmuscle.manager.FatConfigManager;
+import com.mxsella.fatmuscle.utils.MetricInchUnitUtil;
 import com.mxsella.fatmuscle.utils.PaintUtil;
 
 public class FatStandardView extends View {
@@ -43,7 +43,6 @@ public class FatStandardView extends View {
     private int unSelectColor;
     private String unit;
 
-    /* loaded from: classes.dex */
     private enum level {
         thin,
         normal,

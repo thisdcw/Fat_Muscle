@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.mxsella.fat_muscle.R;
 import com.mxsella.fatmuscle.common.MyApplication;
-import com.mxsella.fatmuscle.sdk.util.DensityUtil;
+import com.mxsella.fatmuscle.utils.DensityUtil;
 
 public class CustomDialog extends Dialog {
     private static DialogManager.OnDismissListener onDismissListener;
@@ -27,7 +27,7 @@ public class CustomDialog extends Dialog {
         super(context, i);
     }
 
-    @Override // android.app.Dialog, android.content.DialogInterface
+    @Override
     public void dismiss() {
         super.dismiss();
         DialogManager.OnDismissListener onDismissListener2 = onDismissListener;
@@ -36,7 +36,6 @@ public class CustomDialog extends Dialog {
         }
     }
 
-    /* loaded from: classes.dex */
     public static class Builder {
         private View contentView;
         private Context context;
