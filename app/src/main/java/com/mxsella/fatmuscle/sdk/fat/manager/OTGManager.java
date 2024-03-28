@@ -157,7 +157,6 @@ public class OTGManager implements IDataTransfer {
     public OTGManager(Context context) {
         this.mContext = context;
         this.intent = PendingIntent.getBroadcast(MyApplication.getInstance(), 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE);
-
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_USB_PERMISSION);
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
@@ -168,9 +167,11 @@ public class OTGManager implements IDataTransfer {
 
     public void send(DeviceMsg deviceMsg) {
         if (this.isRunning) {
+            LogUtil.d("添加发送消息1 => "+deviceMsg);
             this.msgsQueue.add(deviceMsg);
             return;
         }
+        LogUtil.d("添加发送消息2 => "+deviceMsg);
         DataTransListerner dataTransListerner = this.mDataTransListerner;
         if (dataTransListerner != null) {
             dataTransListerner.onCmdMessage(deviceMsg.getMsgId(), new byte[4], 1, DataTransListerner.ProtocolType.OTG);
@@ -178,7 +179,6 @@ public class OTGManager implements IDataTransfer {
     }
 
     public void send(int i, int i2) {
-        LogUtil.d("不添加数据数组");
         DeviceMsg deviceMsg = new DeviceMsg();
         deviceMsg.setMsgId(i);
         deviceMsg.setContent(i2);
@@ -186,7 +186,6 @@ public class OTGManager implements IDataTransfer {
     }
 
     public void send(int i, byte[] bArr) {
-        LogUtil.d("添加数据数组");
         DeviceMsg deviceMsg = new DeviceMsg();
         deviceMsg.setMsgId(i);
         deviceMsg.setContentArray(bArr);
@@ -226,15 +225,6 @@ public class OTGManager implements IDataTransfer {
             }
             this.mReceiveThread = new ReceiveThread();
             this.isRunning = true;
-            send(SendData.no1());
-            send(SendData.no2());
-            send(SendData.no3());
-            send(SendData.no4());
-            send(SendData.no5());
-            send(SendData.no6());
-            send(SendData.no7());
-            send(SendData.no8());
-            send(SendData.no9());
             this.mSendThread.start();
             this.mReceiveThread.start();
         }
@@ -273,34 +263,18 @@ public class OTGManager implements IDataTransfer {
         }
         byte[] protocolBytes = deviceMsg.getProtocolBytes();
         int bulkTransfer = this.deviceConnection.bulkTransfer(this.usbEpOut, protocolBytes, protocolBytes.length, 3000);
-        Log.i(TAG, "sendDatas: result:" + bulkTransfer);
+        Log.i(TAG, "sendDatas: result:" + Arrays.toString(protocolBytes));
+        return bulkTransfer > 0;
+    }
+    public boolean sendDatas(byte[] buffer) {
+        if (this.deviceConnection == null) {
+            return false;
+        }
+        int bulkTransfer = this.deviceConnection.bulkTransfer(this.usbEpOut, buffer, buffer.length, 3000);
+        Log.i(TAG, "sendDatas: result:" + Arrays.toString(buffer));
         return bulkTransfer > 0;
     }
 
-    static UsbDeviceConnection getConnection(OTGManager otgManager) {
-        return otgManager.deviceConnection;
-    }
-
-    static UsbEndpoint getUsbEpIn(OTGManager otgManager) {
-        return otgManager.usbEpIn;
-    }
-
-    static DataTransListerner setDataTransListerner(OTGManager otgManager) {
-        return otgManager.mDataTransListerner;
-    }
-
-    static int setFirmwareCurrentSize(OTGManager otgManager) {
-        return otgManager.fimwareCurrentSize;
-    }
-
-    static boolean getFlag(OTGManager otgManager, boolean flag) {
-        otgManager.isFimwareFlag = flag;
-        return flag;
-    }
-
-    static int getFirmWareAllSize(OTGManager otgManager) {
-        return otgManager.fimwareAllSize;
-    }
 
     private class ReceiveThread extends Thread {
         private boolean isRunning;
@@ -322,7 +296,7 @@ public class OTGManager implements IDataTransfer {
                     while (this.isRunning) {
                         int i = 2;
                         int i1 = deviceConnection.bulkTransfer(usbEpIn, bArr, 512, 3000);
-                        LogUtil.d("读取otg 设备数据 => " + Arrays.toString(bArr) + "数据长度" + i1);
+//                        LogUtil.d("读取otg 设备数据 => " + Arrays.toString(bArr) + "数据长度" + i1);
                         if (i1 > 0) {
                             currentTime = SystemClock.uptimeMillis();
                             if (ByteUtil.getIntByShort(bArr, 2) == 9188 && ByteUtil.getIntByShort(bArr, 4) == 4261) {
@@ -342,7 +316,7 @@ public class OTGManager implements IDataTransfer {
                                     LogUtil.e("-->2");
                                     mDataTransListerner.onImageData(bArr2, state, DataTransListerner.ProtocolType.OTG);
                                 }
-                            } else if (ByteUtil.getIntByShort(bArr, 2) == 9188 && ByteUtil.getIntByShort(bArr, 4) == 4277 && MxsellaDeviceManager.getInstance().getDeviceVersion() < 20) {
+                            } else if (ByteUtil.getIntByShort(bArr, 2) == MAGIC_NUMBER && ByteUtil.getIntByShort(bArr, 4) == Constant.DEVICE_FIRMWARE_UPDATE && MxsellaDeviceManager.getInstance().getDeviceVersion() < 20) {
                                 if (bArr[8] == 0) {
                                     if ((bArr[18] & 255) == 170) {
                                         if (bArr[8] != 0) {

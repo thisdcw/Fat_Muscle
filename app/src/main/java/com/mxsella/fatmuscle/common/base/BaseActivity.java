@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 
 import com.mxsella.fatmuscle.utils.PermissionUtils;
 import com.ftdi.j2xx.D2xxManager;
@@ -19,9 +21,11 @@ import com.ftdi.j2xx.FT_Device;
 import com.ftdi.j2xx.FT_EEPROM;
 import com.ftdi.j2xx.FT_EEPROM_232H;
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity<T extends ViewDataBinding> extends AppCompatActivity {
 
-    private Context mContext;
+    public Context mContext;
+
+    public T binding;
 
     public D2xxManager ftD2xx;
 
@@ -29,6 +33,18 @@ public abstract class BaseActivity extends AppCompatActivity {
 
 
     protected abstract void initView();
+
+    public abstract int getLayoutId();
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mContext = this;
+        ActivityStackManager.getInstance().addActivity(this);
+        binding = DataBindingUtil.setContentView(this, getLayoutId());
+        initGetData();
+        initView();
+    }
 
     @Override
     protected void onStart() {
@@ -103,20 +119,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         Toast.makeText(mContext, msg, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mContext = this;
-        initGetData();
-        initView();
-        ActivityStackManager.getInstance().addActivity(this);
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         ActivityStackManager.getInstance().removeActivity(this);
         mContext = null;
+        binding =null;
     }
 
     @Override

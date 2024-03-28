@@ -5,8 +5,7 @@ import com.mxsella.fatmuscle.sdk.fat.entity.BitmapMsg;
 
 public interface DataTransListerner {
     public enum ProtocolType {
-        OTG,
-        BLE
+        OTG
     }
 
     void onCmdMessage(int i, byte[] bArr, int i2, ProtocolType protocolType);

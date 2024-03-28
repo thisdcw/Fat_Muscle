@@ -17,17 +17,15 @@ import com.mxsella.fatmuscle.ui.adapter.HistoryListAdapter;
 
 import java.util.List;
 
-public class HistoryListActivity extends BaseActivity implements AdapterView.OnItemClickListener {
+public class HistoryListActivity extends BaseActivity<ActivityHistoryListBinding> implements AdapterView.OnItemClickListener {
 
-    ActivityHistoryListBinding historyListBinding;
     HistoryListAdapter listAdapter;
 
     @Override
     protected void initView() {
-        historyListBinding = DataBindingUtil.setContentView(this, R.layout.activity_history_list);
         listAdapter = new HistoryListAdapter(this);
-        historyListBinding.lvHistory.setAdapter(listAdapter);
-        historyListBinding.lvHistory.setOnItemClickListener(this);
+        binding.lvHistory.setAdapter(listAdapter);
+        binding.lvHistory.setOnItemClickListener(this);
         findViewById(R.id.back_icon).setOnClickListener(v -> {
             HistoryListActivity.this.finish();
         });
@@ -36,9 +34,9 @@ public class HistoryListActivity extends BaseActivity implements AdapterView.OnI
             List<FatRecord> allFatRecord = MyApplication.getInstance().db.fatRecordDao().getAllFatRecord();
             if (allFatRecord.size() < 1) {
                 Log.d("record", "没有历史记录");
-                historyListBinding.tvEmptyHint.setVisibility(View.VISIBLE);
+                binding.tvEmptyHint.setVisibility(View.VISIBLE);
             } else {
-                historyListBinding.tvEmptyHint.setVisibility(View.GONE);
+                binding.tvEmptyHint.setVisibility(View.GONE);
                 for (FatRecord fatRecord : allFatRecord) {
                     Log.d("record", fatRecord.toString());
                 }
@@ -46,6 +44,11 @@ public class HistoryListActivity extends BaseActivity implements AdapterView.OnI
             }
         });
 
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_history_list;
     }
 
     @Override

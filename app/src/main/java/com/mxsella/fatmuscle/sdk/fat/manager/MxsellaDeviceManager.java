@@ -27,6 +27,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -35,6 +37,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
 
     private static final String ACTION_USB_DETACHED_PERMISSION = "android.hardware.usb.action.USB_DEVICE_DETACHED";
     private static final String ACTION_USB_DEVICE_ATTACHED = "android.hardware.usb.action.USB_DEVICE_ATTACHED";
+    private static final String ACTION_USB_ACCESSORY_ATTACHED = "android.hardware.usb.action.USB_ACCESSORY_ATTACHED";
     private static final String ACTION_USB_PERMISSION = "com.template.USB_PERMISSION";
     private static final String CUR_SEL_DEVICE_CODE = "cur_device_code";
     private static final String DATA_DEVICE_DATA_RATE_KEY = "blue_speed_rate";
@@ -165,6 +168,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
             this.mOTGManager.send(i, i2);
         }
     }
+
     public void setDeviceSampleLen(int i, DeviceResultInterface deviceResultInterface) {
         if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_SAMPLE_LEN)) {
             sendCmd(Constant.DEVICE_SAMPLE_LEN, i);
@@ -184,11 +188,13 @@ public class MxsellaDeviceManager implements DataTransListerner {
             sendCmd(Constant.DEVICE_CUT_POINTS, i);
         }
     }
+
     public void setDeviceLineNum(int i, DeviceResultInterface deviceResultInterface) {
         if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_LINE_NUM)) {
             sendCmd(Constant.DEVICE_LINE_NUM, i);
         }
     }
+
     public void setDevicePulseWidth(int i, DeviceResultInterface deviceResultInterface) {
         if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_PULSE_WIDTH)) {
             sendCmd(Constant.DEVICE_PULSE_WIDTH, i);
@@ -200,26 +206,31 @@ public class MxsellaDeviceManager implements DataTransListerner {
             this.mOTGManager.send(i, bArr);
         }
     }
+
     public void setDeviceRxGate(byte[] bArr, DeviceResultInterface deviceResultInterface) {
         if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_RXATE_DELAY)) {
             sendCmd(Constant.DEVICE_RXATE_DELAY, bArr);
         }
     }
+
     public void setDeviceFpgaSpiDma(int i, DeviceResultInterface deviceResultInterface) {
         if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_FPGA_SPI_DMA)) {
             sendCmd(Constant.DEVICE_FPGA_SPI_DMA, i);
         }
     }
+
     public void setDeviceAdcConf(byte[] bArr, DeviceResultInterface deviceResultInterface) {
         if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_ADC_CONF)) {
             sendCmd(Constant.DEVICE_ADC_CONF, bArr);
         }
     }
+
     public void setDeviceAfePowerCtrl(int i, DeviceResultInterface deviceResultInterface) {
         if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_AFE_POWER_CTRL)) {
             sendCmd(Constant.DEVICE_AFE_POWER_CTRL, i);
         }
     }
+
     public void setBlueSpeedRateLeve(int i) {
         this.blueSpeedRateLeve = i;
         SharedPreferencesUtil.saveInt(this.mContext, DATA_DEVICE_DATA_RATE_KEY, i);
@@ -238,11 +249,15 @@ public class MxsellaDeviceManager implements DataTransListerner {
             sendCmd(Constant.DEVICE_TXDATA_RATE, i);
         }
     }
+    public void sendDatas(byte[] buffer) {
+       mOTGManager.sendDatas(buffer);
+    }
     public void startUpgradeFirmware(DeviceResultInterface deviceResultInterface) {
         if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_FIRMWARE_START)) {
             sendCmd(Constant.DEVICE_FIRMWARE_START, 1);
         }
     }
+
     public void restartFirmware(DeviceResultInterface deviceResultInterface) {
         if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_FIRMWARE_RESTART)) {
             sendCmd(Constant.DEVICE_FIRMWARE_RESTART, 1);
@@ -256,6 +271,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
     }
 
     public void setDeviceImageDataEnable(boolean z, DeviceResultInterface deviceResultInterface) {
+        LogUtil.d(z ? "禁用" : "打开");
         if (checkDeviceConnectStatus(deviceResultInterface, Constant.DEVICE_SETTING_DOWN_UPDATE)) {
             sendCmd(Constant.DEVICE_SETTING_DOWN_UPDATE, z ? 1 : 0);
         }
@@ -263,14 +279,14 @@ public class MxsellaDeviceManager implements DataTransListerner {
 
     private void initDeviceParameter(DeviceMsg deviceMsg) {
         deviceMsg.getProtocolType();
-
+        LogUtil.d("初始化设备参数");
         setDeviceImageDataEnable(false, (z, obj2) -> {
-            if (MxsellaDeviceManager.this.curDeviceCode == 0) {
-                MxsellaDeviceManager.this.setDeviceTGC(Constant.tgcArray, null);
+            if (curDeviceCode == 0) {
+                setDeviceTGC(Constant.tgcArray, null);
             }
-            MxsellaDeviceManager.this.setDeviceDefaultParams(FatConfigManager.getInstance().getCurDeviceDepthLeve(), null);
-            MxsellaDeviceManager.this.getDeviceFlashId(null);
-            MxsellaDeviceManager.this.setDeviceImageDataEnable(true, null);
+            setDeviceDefaultParams(FatConfigManager.getInstance().getCurDeviceDepthLeve(), null);
+            getDeviceFlashId(null);
+            setDeviceImageDataEnable(true, null);
         });
     }
 
@@ -291,7 +307,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
         Log.i(TAG, "===eventDevice=====msg=" + Integer.toHexString(deviceMsg.getMsgId()) + " data=" + deviceMsg.toString() + " result :" + deviceMsg.getError());
         int msgId = deviceMsg.getMsgId();
         boolean z = false;
-        if (msgId == -1) {
+        if (msgId == Constant.DEVICE_DISCONNECTED_MSG_ID) {
             Log.i(TAG, "msgId == -1");
             for (DeviceInterface deviceInterface : this.deviceInterfaces) {
                 if (deviceInterface != null) {
@@ -308,11 +324,11 @@ public class MxsellaDeviceManager implements DataTransListerner {
             this.interfaceHashMap.clear();
             return;
         }
-        if (msgId == 432 || msgId == 4272) {
+        if (msgId == Constant.R_DEVICE_VERSION || msgId == Constant.DEVICE_VERSION) {
             Log.i(TAG, "msgId == 432");
             initDeviceParameter(deviceMsg);
             deviceMsg.setMsgId(Constant.DEVICE_VERSION);
-        } else if (msgId == 34952) {
+        } else if (msgId == Constant.DEVICE_CONNECTED_MSG_ID) {
             Log.i(TAG, "msgId == 34952");
             for (DeviceInterface deviceInterface2 : this.deviceInterfaces) {
                 if (deviceInterface2 != null) {
@@ -326,7 +342,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
                     Log.i(TAG, "msgId == 349522");
                     return;
                 }
-                MxsellaDeviceManager.this.getDeviceVersionInfo(null);
+                getDeviceVersionInfo(null);
             });
             return;
         }
@@ -372,7 +388,9 @@ public class MxsellaDeviceManager implements DataTransListerner {
 
     private boolean checkDeviceConnectStatus(DeviceResultInterface deviceResultInterface, int i) {
         if (!isConnect()) {
+            LogUtil.d("未连接");
             if (deviceResultInterface != null) {
+                LogUtil.d("禁用2");
                 deviceResultInterface.result(false, null);
             }
             return false;
@@ -484,7 +502,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_USB_DETACHED_PERMISSION);
         intentFilter.addAction(ACTION_USB_DEVICE_ATTACHED);
-        intentFilter.addAction("android.hardware.usb.action.USB_ACCESSORY_ATTACHED");
+        intentFilter.addAction(ACTION_USB_ACCESSORY_ATTACHED);
         intentFilter.addAction(ACTION_USB_PERMISSION);
         this.mContext.registerReceiver(this.broadcastReceiver, intentFilter);
     }
@@ -492,21 +510,20 @@ public class MxsellaDeviceManager implements DataTransListerner {
     @Override
     public void onCmdMessage(int i, byte[] bArr, int i2, DataTransListerner.ProtocolType protocolType) {
         LogUtil.d("i => " + i);
-        if (i != -1) {
-            if (i != 432) {
-                if (i != 4277) {
-                    if (i != 4295) {
-                        if (i == 34952) {
+        if (i != Constant.DEVICE_DISCONNECTED_MSG_ID) {
+            if (i != Constant.R_DEVICE_VERSION) {
+                if (i != Constant.DEVICE_FIRMWARE_UPDATE) {
+                    if (i != Constant.DEVICE_PULSE_WIDTH) {
+                        if (i == Constant.DEVICE_CONNECTED_MSG_ID) {
                             setFlashId(null);
                             setDeviceMode(null);
                             DeviceMsg deviceMsg = new DeviceMsg();
                             deviceMsg.setMsgId(i);
                             deviceMsg.setProtocolType(protocolType);
-                            LogUtil.d("连接状态" + deviceMsg.toString());
                             notityMessage(deviceMsg);
                             return;
-                        } else if (i != 4272) {
-                            if (i == 4273) {
+                        } else if (i != Constant.DEVICE_VERSION) {
+                            if (i == Constant.DEVICE_FLASHID) {
                                 FlashMsg flashMsg = new FlashMsg();
                                 flashMsg.unpack(bArr);
                                 flashMsg.setMsgId(i);
@@ -516,12 +533,12 @@ public class MxsellaDeviceManager implements DataTransListerner {
                                 return;
                             }
                             switch (i) {
-                                case Constant.DEVICE_DLPF_M_VALUE /* 4288 */:
-                                case Constant.DEVICE_DLPF_PARA /* 4289 */:
-                                case Constant.DEVICE_CUT_POINTS /* 4290 */:
-                                case Constant.DEVICE_DR_PARA /* 4291 */:
-                                case Constant.DEVICE_LINE_NUM /* 4292 */:
-                                case Constant.DEVICE_LINE_CYCLE /* 4293 */:
+                                case Constant.DEVICE_DLPF_M_VALUE:
+                                case Constant.DEVICE_DLPF_PARA:
+                                case Constant.DEVICE_CUT_POINTS:
+                                case Constant.DEVICE_DR_PARA:
+                                case Constant.DEVICE_LINE_NUM:
+                                case Constant.DEVICE_LINE_CYCLE:
                                     break;
                                 default:
                                     DeviceMsg deviceMsg2 = new DeviceMsg();
@@ -533,14 +550,14 @@ public class MxsellaDeviceManager implements DataTransListerner {
                             }
                         }
                     }
-                    DeviceMsg resultMsg = new ResultMsg();
+                    ResultMsg resultMsg = new ResultMsg();
                     resultMsg.unpack(bArr);
                     resultMsg.setMsgId(i);
                     resultMsg.setError(i2);
                     notityMessage(resultMsg);
                     return;
                 }
-                DeviceMsg firmwareUpdateMsg = new FirmwareUpdateMsg();
+                FirmwareUpdateMsg firmwareUpdateMsg = new FirmwareUpdateMsg();
                 firmwareUpdateMsg.setMsgId(Constant.DEVICE_FIRMWARE_UPDATE);
                 firmwareUpdateMsg.setError(i2);
                 firmwareUpdateMsg.unpack(bArr);
@@ -552,7 +569,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
             versionMsg.unpack(bArr);
             versionMsg.setMsgId(i);
             versionMsg.setError(i2);
-            this.compileTime = ("20" + versionMsg.getYear()) + "/" + versionMsg.getMonth() + "/" + versionMsg.getDay();
+            this.compileTime = ( "20" + versionMsg.getYear()) + "/" + versionMsg.getMonth() + "/" + versionMsg.getDay();
             if (this.curDeviceCode == 0) {
                 setDeviceMode(versionMsg.getMode() + "");
             }
@@ -560,7 +577,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
                 setDeviceIdentification(versionMsg.getIdentificationCode() + "");
             }
             setDeviceVersion(versionMsg.getVersionNumber());
-            if (versionMsg.getVersionNumber() == 255 || i2 != 8) {
+            if ((versionMsg.getVersionNumber() == 255 || i2 != 8)) {
                 setDeviceVersion(0);
                 this.compileTime = "";
             }
@@ -590,7 +607,7 @@ public class MxsellaDeviceManager implements DataTransListerner {
         this.bitmapMsg.unpack(bArr);
         this.bitmapMsg.setContentArray(bArr);
         this.bitmapMsg.setState(state);
-        this.bitmapMsg.setMsgId(4261);
+        this.bitmapMsg.setMsgId(Constant.DEVICE_IMAGE_DATA);
         this.mBitmapMsg = this.bitmapMsg;
         if (state == BitmapMsg.State.START) {
             BitmapUtil.initList();

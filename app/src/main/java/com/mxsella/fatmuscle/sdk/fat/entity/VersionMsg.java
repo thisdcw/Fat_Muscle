@@ -80,15 +80,6 @@ public class VersionMsg extends DeviceMsg{
         if (bArr == null || bArr.length < 10) {
             return;
         }
-        if (this.mProtocolType == DataTransListerner.ProtocolType.BLE) {
-            this.mode = bArr[0] & 255;
-            this.identificationCode = bArr[1] & 255;
-            this.versionNumber = bArr[2] & 255;
-            this.year = ByteUtil.getIntByShort(bArr, 4);
-            this.month = bArr[6] & 255;
-            this.day = bArr[7] & 255;
-            return;
-        }
         this.mode = bArr[0] & 255;
         this.identificationCode = bArr[1] & 255;
         this.versionNumber = bArr[2] & 255;

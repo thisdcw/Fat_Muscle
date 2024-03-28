@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.mxsella.fatmuscle.sdk.fat.inter.DataTransListerner;
 import com.mxsella.fatmuscle.utils.ByteUtil;
+import com.mxsella.fatmuscle.utils.LogUtil;
 
 import org.opencv.videoio.Videoio;
 
@@ -113,7 +114,7 @@ public class DeviceMsg {
     }
 
     public void setContent(int i) {
-        Log.i(TAG, "setContent: " + i);
+        LogUtil.i("setContent: " + i);
         this.content = i;
     }
 

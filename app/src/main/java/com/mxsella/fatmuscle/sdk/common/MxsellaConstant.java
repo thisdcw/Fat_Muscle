@@ -2,6 +2,8 @@ package com.mxsella.fatmuscle.sdk.common;
 
 import android.os.Environment;
 
+import com.mxsella.fatmuscle.sdk.VolAlg;
+
 public class MxsellaConstant {
     public static final int DEVICE_DLPF_M_VALUE = 4288;
 

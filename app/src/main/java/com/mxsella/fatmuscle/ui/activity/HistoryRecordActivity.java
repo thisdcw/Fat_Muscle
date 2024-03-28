@@ -39,9 +39,8 @@ import com.mxsella.fatmuscle.view.widget.FatStandardView;
 
 import java.util.ArrayList;
 
-public class HistoryRecordActivity extends BaseActivity implements View.OnClickListener {
+public class HistoryRecordActivity extends BaseActivity<ActivityHistoryRecordBinding> implements View.OnClickListener {
 
-    ActivityHistoryRecordBinding historyRecordBinding;
     public static ArrayList<FatRecord> listObj = null;
     public static final String sHISTORY_RECORD_POSITION = "history_record_position";
 
@@ -74,7 +73,6 @@ public class HistoryRecordActivity extends BaseActivity implements View.OnClickL
     }
     @Override
     protected void initView() {
-        historyRecordBinding = DataBindingUtil.setContentView(this, R.layout.activity_history_record);
 
         ((ImageView) findViewById(R.id.back_icon)).setOnClickListener(view -> HistoryRecordActivity.this.finish());
         TextView textView = (TextView) findViewById(R.id.title);
@@ -95,6 +93,11 @@ public class HistoryRecordActivity extends BaseActivity implements View.OnClickL
             this.position = getIntent().getIntExtra(sHISTORY_RECORD_POSITION, 0);
             initData();
         }
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_history_record;
     }
 
     public void initData() {
@@ -218,7 +221,7 @@ public class HistoryRecordActivity extends BaseActivity implements View.OnClickL
             this.mComparisonTv.setVisibility(View.GONE);
         }
 
-        historyRecordBinding.scrollView.
+        binding.scrollView.
                 setOnTouchListener((view, motionEvent) ->
 
                 {

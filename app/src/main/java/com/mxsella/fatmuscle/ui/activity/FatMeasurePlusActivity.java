@@ -1,7 +1,10 @@
 package com.mxsella.fatmuscle.ui.activity;
 
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -19,6 +22,7 @@ import com.mxsella.fat_muscle.R;
 import com.mxsella.fat_muscle.databinding.ActivityFatMeasurePlusBinding;
 import com.mxsella.fatmuscle.common.MyApplication;
 import com.mxsella.fatmuscle.common.base.BaseActivity;
+import com.mxsella.fatmuscle.sdk.common.Constant;
 import com.mxsella.fatmuscle.sdk.common.MxsellaConstant;
 import com.mxsella.fatmuscle.sdk.fat.entity.BitmapMsg;
 import com.mxsella.fatmuscle.sdk.fat.entity.DeviceMsg;
@@ -31,21 +35,22 @@ import com.mxsella.fatmuscle.sdk.fat.utils.BitmapUtil;
 import com.mxsella.fatmuscle.sdk.fat.utils.FileIOUtils;
 import com.mxsella.fatmuscle.sdk.fat.utils.MetricInchUnitUtil;
 import com.mxsella.fatmuscle.sdk.fat.utils.OpenCvMeasureUtil;
+import com.mxsella.fatmuscle.sdk.util.DensityUtil;
 import com.mxsella.fatmuscle.sdk.util.SystemParamUtil;
 import com.mxsella.fatmuscle.sdk.util.ThreadUtils;
 import com.mxsella.fatmuscle.sdk.util.ToastUtil;
 import com.mxsella.fatmuscle.utils.ArrayUtil;
 import com.mxsella.fatmuscle.utils.DateUtil;
+import com.mxsella.fatmuscle.view.CustomVideoView;
 import com.mxsella.fatmuscle.view.MeasureDividingRuleView;
+import com.mxsella.fatmuscle.view.MeasurePlusView;
+import com.mxsella.fatmuscle.view.dialog.DialogManager;
+import com.mxsella.fatmuscle.view.widget.FatStandardView;
 
-public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDeviceManager.DeviceInterface {
+import java.util.Locale;
 
-    ActivityFatMeasurePlusBinding fatMeasurePlusBinding;
+public class FatMeasurePlusActivity extends BaseActivity<ActivityFatMeasurePlusBinding> implements MxsellaDeviceManager.DeviceInterface {
     private static final String TAG = "MuscleMeasureResultActivity";
-    AnrWatchDog anrWatchDog;
-    private TextView mTvStatusTip;
-    private MeasureDividingRuleView measureDividingRuleView;
-    private LinearLayout measureRoot;
     private int count = 0;
     private boolean isAgainMeasure = false;
     private boolean isShow = false;
@@ -53,16 +58,16 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
     private int measureFailCount = 0;
     private int thresholdValue = 3;
 
-    private Handler mHandler = new Handler() { // from class: com.marvoto.fat.module.measure.ui.FatMeasurePlusActivity.1
-        @Override // android.os.Handler
+    private Handler mHandler = new Handler() {
+        @Override
         public void handleMessage(Message message) {
             super.handleMessage(message);
             if (message.what == 2) {
-                FatMeasurePlusActivity.this.showResult((BitmapMsg) message.obj, false);
+                showResult((BitmapMsg) message.obj, false);
             } else if (message.what == 3) {
-                FatMeasurePlusActivity.this.showResult((BitmapMsg) message.obj, true);
+                showResult((BitmapMsg) message.obj, true);
             } else if (message.what == 5) {
-                FatMeasurePlusActivity.this.fatMeasurePlusBinding.viewMeasure.setShowUltrasoundImg(true);
+                binding.viewMeasure.setShowUltrasoundImg(true);
             } else {
                 int i = message.what;
             }
@@ -71,112 +76,34 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
 
     Handler handler = new Handler(Looper.getMainLooper(), message -> {
         BitmapMsg bitmapMsg = new BitmapMsg();
-        bitmapMsg.setMsgId(4261);
+        bitmapMsg.setMsgId(Constant.DEVICE_IMAGE_DATA);
         bitmapMsg.setState(BitmapMsg.State.END);
-        FatMeasurePlusActivity.this.onMessage(bitmapMsg);
+        onMessage(bitmapMsg);
         return true;
     });
+    CustomVideoView customVideoView = null;
+    CustomVideoView customLineVideoView = null;
 
     public void toShowMeasureResult() {
-        this.mTvStatusTip.setVisibility(View.GONE);
+        binding.statusTip.setVisibility(View.GONE);
         setVideoVisibility(false);
-        this.fatMeasurePlusBinding.analysisButton.setVisibility(View.VISIBLE);
-        this.measureFailCount = 0;
-        this.fatMeasurePlusBinding.viewMeasure.setShowUltrasoundImg(true);
+        binding.analysisButton.setVisibility(View.VISIBLE);
+        measureFailCount = 0;
+        binding.viewMeasure.setShowUltrasoundImg(true);
         if (FatConfigManager.getInstance().isAutoMeasure()) {
-            this.fatMeasurePlusBinding.analysisButton.setText(R.string.analysis);
+            binding.resultRl.setVisibility(View.VISIBLE);
+            this.binding.analysisButton.setText(R.string.analysis);
             return;
         }
-        this.fatMeasurePlusBinding.viewMeasure.setShowUltrasoundImg(false);
-        this.fatMeasurePlusBinding.analysisButton.setText(R.string.to_measure);
+        binding.viewMeasure.setShowUltrasoundImg(false);
+        binding.otherGuide.setVisibility(View.VISIBLE);
+        binding.analysisButton.setText(R.string.to_measure);
+        binding.otherGuide.setText(getString(R.string.part_fat_measure, new Object[]{FatConfigManager.getInstance().getCurBodyParts().getName()}));
+        binding.otherGuide.setCompoundDrawablesWithIntrinsicBounds(null, null, null, getDrawable(FatConfigManager.getInstance().getCurBodyParts().getMusclePartIcon().intValue()));
     }
 
-    @Override
-    protected void initView() {
-        fatMeasurePlusBinding = DataBindingUtil.setContentView(this, R.layout.activity_fat_measure_plus);
-
-        MxsellaDeviceManager.getInstance().connectDevice();
-        this.measureFailCount = 0;
-        //TODO 状态条
-//        StatusBarUtil.setColor(this, -1, 5);
-//        StatusBarUtil.StatusBarLightMode(this);
-        fatMeasurePlusBinding.analysisButton.setOnClickListener(view -> {
-            if (FatConfigManager.getInstance().isAutoMeasure()) {
-                if (FatMeasurePlusActivity.this.fatMeasurePlusBinding.viewMeasure.isShowUltrasoundImg()) {
-                    FatMeasurePlusActivity.this.fatMeasurePlusBinding.viewMeasure.setShowUltrasoundImg(false);
-                } else {
-                    FatMeasurePlusActivity.this.fatMeasurePlusBinding.viewMeasure.setShowUltrasoundImg(true);
-                }
-                return;
-            }
-            FatMeasurePlusActivity.this.fatMeasurePlusBinding.analysisButton.setVisibility(View.GONE);
-            int[] iArr2 = {0, 90, 75, 90, 149, 90};
-            FatMeasurePlusActivity.this.fatMeasurePlusBinding.viewMeasure.setArray(iArr2, FatRecord.TYPE.MUSCLE);
-            float avgValue2 = (ArrayUtil.avgValue(iArr2) * FatConfigManager.getInstance().getAlgoDepth(MxsellaDeviceManager.getInstance().getOcxo())) / BitmapUtil.sBitmapHight;
-            FatMeasurePlusActivity.this.mLastBitmapMsg.setArray(iArr2);
-            FatMeasurePlusActivity.this.mLastBitmapMsg.setFatThickness(avgValue2);
-            FatMeasurePlusActivity.this.fatMeasurePlusBinding.viewMeasure.setShowUltrasoundImg(true);
-            FatMeasurePlusActivity.this.fatMeasurePlusBinding.viewMeasure.setPosition(avgValue2);
-            if (FatConfigManager.getInstance().isFangkeMode()) {
-                return;
-            }
-        });
-        this.mTvStatusTip = fatMeasurePlusBinding.statusTip;
-        MeasureDividingRuleView measureDividingRuleView = fatMeasurePlusBinding.viewDividingRule;
-        this.measureDividingRuleView = measureDividingRuleView;
-        measureDividingRuleView.setOcxo(MxsellaDeviceManager.getInstance().getOcxo(), BitmapUtil.sBitmapHight);
-
-
-        this.measureRoot = fatMeasurePlusBinding.measureRoot;
-
-        MxsellaDeviceManager.getInstance().registerDeviceInterface(this);
-        Log.i(TAG, "initGetData: " + this.isShow);
-        AnrWatchDog build = new AnrWatchDog.Builder().timeout(30000).ignoreDebugger(true).anrListener(str -> {
-
-                    Log.i(TAG, "文件保存");
-                    FileIOUtils.writeFileFromString(MxsellaConstant.APP_DIR_PATH + "/anr/" + DateUtil.getDate2String(System.currentTimeMillis(), "MM_dd_HH_mm_ss") + ".txt", str);
-                }
-        ).build();
-        this.anrWatchDog = build;
-        build.start();
-        this.measureDividingRuleView.setInit(this.fatMeasurePlusBinding.ivImage.getWidth(), this.fatMeasurePlusBinding.ivImage.getHeight(), FatConfigManager.getInstance().getCurDeviceDepth());
-
-        if (FatConfigManager.getInstance().getCurBodyPositionIndex() == 6) {
-            this.thresholdValue = 1;
-        } else {
-            this.thresholdValue = 3;
-        }
-        this.fatMeasurePlusBinding.ivImage.setImageBitmap(BitmapUtil.getImageOneDimensional());
-        this.fatMeasurePlusBinding.viewMeasure.setMeasureCallBack(iArr -> {
-            if (iArr == null) {
-                return;
-            }
-            float algoDepth = FatConfigManager.getInstance().getAlgoDepth(MxsellaDeviceManager.getInstance().getOcxo());
-            float avgValue = ArrayUtil.avgValue(iArr);
-            if (avgValue < 0.0f) {
-                avgValue = 0.0f;
-            }
-            float f = (avgValue * algoDepth) / BitmapUtil.sBitmapHight;
-            FatMeasurePlusActivity.this.fatMeasurePlusBinding.viewMeasure.setPosition(f);
-            FatMeasurePlusActivity.this.mLastBitmapMsg.setArray(iArr);
-            FatMeasurePlusActivity.this.mLastBitmapMsg.setFatThickness(f);
-        });
-
-        playGuideVideo();
-        this.fatMeasurePlusBinding.viewMeasure.setDepth(3, MxsellaDeviceManager.getInstance().getOcxo(), BitmapUtil.sBitmapHight);
-        this.measureDividingRuleView.setOcxo(MxsellaDeviceManager.getInstance().getOcxo(), BitmapUtil.sBitmapHight);
-        initGetData();
-
-        getWindow().addFlags(128);
-        fatMeasurePlusBinding.close.setOnClickListener(view -> {
-            FatMeasurePlusActivity.this.finish();
-        });
-    }
-
-
-    @Override
-    public void onConnected() {
-        this.mTvStatusTip.setText(R.string.collected);
+    public void close(View view) {
+        finish();
     }
 
     public void showResult(BitmapMsg bitmapMsg, boolean z) {
@@ -194,18 +121,18 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
                 }
                 MxsellaDeviceManager.getInstance().setEnd(true);
                 setVideoVisibility(false);
-                this.mTvStatusTip.setVisibility(View.GONE);
+                binding.statusTip.setVisibility(View.GONE);
                 if (fatThickness == -3.0f) {
-                    fatMeasurePlusBinding.showReason.setText(R.string.too_week_result);
+                    binding.showReason.setText(R.string.too_week_result);
                     return;
                 } else if (FatConfigManager.getInstance().isAutoMeasure()) {
-                    fatMeasurePlusBinding.showReason.setText(MxsellaDeviceManager.getInstance().isToBusinessVersion() ? R.string.un_found_result_manually : R.string.un_found_result);
+                    binding.showReason.setText(MxsellaDeviceManager.getInstance().isToBusinessVersion() ? R.string.un_found_result_manually : R.string.un_found_result);
                     if (MxsellaDeviceManager.getInstance().isToBusinessVersion()) {
-                        this.fatMeasurePlusBinding.analysisButton.setVisibility(View.VISIBLE);
+                        this.binding.analysisButton.setVisibility(View.VISIBLE);
                     } else {
-                        this.fatMeasurePlusBinding.analysisButton.setVisibility(View.GONE);
+                        this.binding.analysisButton.setVisibility(View.GONE);
                     }
-                    this.fatMeasurePlusBinding.analysisButton.setText(R.string.manual_measure);
+                    this.binding.analysisButton.setText(R.string.manual_measure);
                 }
                 showOpenMeasureLineDialog();
             }
@@ -218,21 +145,230 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
         if (fatThickness == -1.0f || fatThickness == -2.0f || fatThickness == -3.0f || fatThickness == -4.0f || !z) {
             return;
         }
-        this.fatMeasurePlusBinding.viewMeasure.setDepth(FatConfigManager.getInstance().getCurDeviceDepth(), MxsellaDeviceManager.getInstance().getOcxo(), BitmapUtil.sBitmapHight);
-        this.measureDividingRuleView.setOcxo(MxsellaDeviceManager.getInstance().getOcxo(), BitmapUtil.sBitmapHight);
-        this.fatMeasurePlusBinding.viewMeasure.setPosition(fatThickness);
+        this.binding.viewMeasure.setDepth(FatConfigManager.getInstance().getCurDeviceDepth(), MxsellaDeviceManager.getInstance().getOcxo(), BitmapUtil.sBitmapHight);
+        binding.viewDividingRule.setOcxo(MxsellaDeviceManager.getInstance().getOcxo(), BitmapUtil.sBitmapHight);
+        this.binding.viewMeasure.setPosition(fatThickness);
         this.mHandler.sendEmptyMessageDelayed(6, 1000L);
-        this.measureDividingRuleView.setInit(this.fatMeasurePlusBinding.ivImage.getWidth(), this.fatMeasurePlusBinding.ivImage.getHeight(), FatConfigManager.getInstance().getCurDeviceDepth());
-        this.fatMeasurePlusBinding.ivImage.setImageBitmap(bitmapMsg.getBitmap());
+        binding.viewDividingRule.setInit(this.binding.ivImage.getWidth(), this.binding.ivImage.getHeight(), FatConfigManager.getInstance().getCurDeviceDepth());
+        this.binding.ivImage.setImageBitmap(bitmapMsg.getBitmap());
         showOpenMeasureLineDialog();
     }
 
     private void setVideoVisibility(boolean z) {
         if (z) {
             playGuideVideo();
+            return;
         }
+        this.customVideoView.setVisibility(View.GONE);
+        CustomVideoView customVideoView = this.customVideoView;
+        if (customVideoView == null || !customVideoView.isPlaying()) {
+            return;
+        }
+        this.customVideoView.stopPlayback();
+
     }
 
+    private void warningDialog(float f, BitmapMsg bitmapMsg) {
+        if (isFinishing()) {
+            return;
+        }
+        SpannableString spannableString = new SpannableString(getString(R.string.measure_warning_content));
+        final DialogManager dialogManager = new DialogManager(this, getString(R.string.measure_warning_tip), spannableString, this.mContext.getString(R.string.save), this.mContext.getString(R.string.ignore));
+        spannableString.setSpan(new ClickableSpan() {
+            @Override
+            public void updateDrawState(TextPaint textPaint) {
+                super.updateDrawState(textPaint);
+                textPaint.setColor(getResources().getColor(R.color.grey));
+                textPaint.setTextSize(DensityUtil.dip2px(mContext, 13.0f));
+            }
+
+            @Override
+            public void onClick(View view) {
+                toTeach();
+                dialogManager.dismissDialog();
+            }
+        }, spannableString.toString().indexOf("\n\n") + 1, spannableString.length(), 33);
+        dialogManager.setVerticalScreen(true);
+        dialogManager.setOnDiaLogListener(new DialogManager.OnDialogListener() {
+            @Override
+            public void dialogBtnRightOrSingleListener(View view, DialogInterface dialogInterface, int i) {
+            }
+
+            @Override
+            public void dialogBtnLeftListener(View view, DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+                mLastBitmapMsg.setFatThickness(-3.0f);
+            }
+        });
+        dialogManager.showDialog();
+    }
+
+    public void toTeach() {
+        //TODO 使用教学
+    }
+
+    public void analysis(View view) {
+        if (FatConfigManager.getInstance().isAutoMeasure()) {
+            if (binding.rlUnFound.getVisibility() == View.VISIBLE) {
+                binding.analysisText.setVisibility(View.GONE);
+                int[] iArr = {0, 100, 25, 88, 50, 88, 75, 86, 100, 89, 125, 87, 149, 89};
+                binding.viewMeasure.setArray(iArr, FatRecord.TYPE.FAT);
+                float avgValue = (ArrayUtil.avgValue(iArr) * FatConfigManager.getInstance().getAlgoDepth(MxsellaDeviceManager.getInstance().getOcxo())) / BitmapUtil.sBitmapHight;
+                mLastBitmapMsg.setArray(iArr);
+                mLastBitmapMsg.setFatThickness(avgValue);
+                binding.resultValue.setVisibility(View.VISIBLE);
+                binding.resultValue.setText(getSpannableStringFatValue(avgValue));
+                binding.fatThiness.setCurFatValue(avgValue);
+                binding.viewMeasure.setShowUltrasoundImg(true);
+                binding.viewMeasure.setPosition(avgValue);
+                binding.resultRl.setVisibility(View.VISIBLE);
+                binding.rlUnFound.setVisibility(View.GONE);
+                if (measureFailCount > 0) {
+                    if (!FatConfigManager.getInstance().isFangkeMode()) {
+                        binding.showSaveRl.setVisibility(View.VISIBLE);
+                        return;
+                    }
+                    binding.analysisButton.setVisibility(View.VISIBLE);
+                    binding.analysisButton.setText(R.string.analysis);
+                    return;
+                }
+                return;
+            } else if (binding.viewMeasure.isShowUltrasoundImg()) {
+                binding.resultRl.setVisibility(View.GONE);
+                binding.rlAns.setVisibility(View.VISIBLE);
+                binding.viewMeasure.setShowUltrasoundImg(false);
+                return;
+            } else {
+                binding.resultRl.setVisibility(View.VISIBLE);
+                binding.rlAns.setVisibility(View.GONE);
+                binding.viewMeasure.setShowUltrasoundImg(true);
+                return;
+            }
+        }
+        binding.otherGuide.setVisibility(View.GONE);
+        binding.analysisButton.setVisibility(View.GONE);
+        int[] iArr2 = {0, 90, 75, 90, 149, 90};
+        binding.viewMeasure.setArray(iArr2, FatRecord.TYPE.MUSCLE);
+        float avgValue2 = (ArrayUtil.avgValue(iArr2) * FatConfigManager.getInstance().getAlgoDepth(MxsellaDeviceManager.getInstance().getOcxo())) / BitmapUtil.sBitmapHight;
+        mLastBitmapMsg.setArray(iArr2);
+        mLastBitmapMsg.setFatThickness(avgValue2);
+        binding.resultValue.setVisibility(View.VISIBLE);
+        binding.resultValue.setText(getSpannableStringFatValue(avgValue2));
+        binding.fatThiness.setCurFatValue(avgValue2);
+        binding.viewMeasure.setShowUltrasoundImg(true);
+        binding.viewMeasure.setPosition(avgValue2);
+        binding.resultRl.setVisibility(View.VISIBLE);
+        binding.rlUnFound.setVisibility(View.GONE);
+        if (FatConfigManager.getInstance().isFangkeMode()) {
+            return;
+        }
+        binding.showSaveRl.setVisibility(View.VISIBLE);
+
+    }
+
+    public void save(View view) {
+        FatMeasurePlusActivity.this.measureFailCount = 0;
+        if (FatConfigManager.getInstance().isAutoMeasure()) {
+            binding.rlAns.setVisibility(View.VISIBLE);
+            binding.analysisText.setText(R.string.analysis);
+        }
+        binding.showSaveRl.setVisibility(View.GONE);
+    }
+
+    public void cancle(View view) {
+        binding.resultRl.setVisibility(View.GONE);
+        binding.viewMeasure.setShowUltrasoundImg(true);
+        binding.viewMeasure.setPosition(0.0f);
+        binding.showSaveRl.setVisibility(View.GONE);
+        if (FatConfigManager.getInstance().isAutoMeasure()) {
+            binding.rlUnFound.setVisibility(View.VISIBLE);
+            binding.rlAns.setVisibility(View.VISIBLE);
+        } else {
+            toShowMeasureResult();
+        }
+        mLastBitmapMsg.setFatThickness(0.0f);
+    }
+
+    public void share(View view) {
+        //TODO 分享
+    }
+
+    @Override
+    protected void initView() {
+        measureFailCount = 0;
+
+        getWindow().addFlags(128);
+        binding.showSaveRl.setClickable(true);
+        binding.fatThiness.setShowValue(false);
+        binding.viewDividingRule.setOcxo(MxsellaDeviceManager.getInstance().getOcxo(), BitmapUtil.sBitmapHight);
+        binding.resultValue.setText(getSpannableStringFatValue(0.0f));
+
+        binding.viewDividingRule.setOcxo(MxsellaDeviceManager.getInstance().getOcxo(), BitmapUtil.sBitmapHight);
+        binding.bodyPosition.setImageDrawable(getResources().getDrawable(FatConfigManager.getInstance().getCurBodyParts().getIconNormal().intValue()));
+        if (FatConfigManager.getInstance().isAutoMeasure()) {
+            binding.note.setText(getString(R.string.result_note, new Object[]{FatConfigManager.getInstance().getCurBodyParts().getName()}));
+        } else {
+            binding.note.setText(getString(R.string.manual_result_note, new Object[]{FatConfigManager.getInstance().getCurBodyParts().getName()}));
+        }
+        MxsellaDeviceManager.getInstance().registerDeviceInterface(this);
+        Log.i(TAG, "initGetData: " + this.isShow);
+        binding.resultValue.setVisibility(View.INVISIBLE);
+        binding.viewDividingRule.setInit(binding.ivImage.getWidth(), binding.ivImage.getHeight(), FatConfigManager.getInstance().getCurDeviceDepth());
+        binding.viewDividingRule.setInit(binding.ivImage.getWidth(), binding.ivImage.getHeight(), FatConfigManager.getInstance().getCurDeviceDepth());
+        if (FatConfigManager.getInstance().getCurBodyPositionIndex() == 1 || FatConfigManager.getInstance().getCurBodyPositionIndex() == 12 || FatConfigManager.getInstance().getCurBodyPositionIndex() == 11) {
+            binding.fatThiness.setVisibility(View.GONE);
+        }
+        if (FatConfigManager.getInstance().getCurBodyPositionIndex() == 6) {
+            this.thresholdValue = 1;
+        } else {
+            this.thresholdValue = 3;
+        }
+        binding.ivImage.setImageBitmap(BitmapUtil.getImageOneDimensional());
+
+        binding.viewMeasure.setMeasureCallBack(iArr -> {
+            if (iArr == null) {
+                return;
+            }
+            float algoDepth = FatConfigManager.getInstance().getAlgoDepth(MxsellaDeviceManager.getInstance().getOcxo());
+            float avgValue = ArrayUtil.avgValue(iArr);
+            if (avgValue < 0.0f) {
+                avgValue = 0.0f;
+            }
+            float f = (avgValue * algoDepth) / BitmapUtil.sBitmapHight;
+            binding.fatThiness.setCurFatValue(f);
+            binding.viewMeasure.setPosition(f);
+            binding.resultValue.setVisibility(View.VISIBLE);
+            binding.resultValue.setText(FatMeasurePlusActivity.this.getSpannableStringFatValue(f));
+            mLastBitmapMsg.setArray(iArr);
+            mLastBitmapMsg.setFatThickness(f);
+        });
+        this.customVideoView = (CustomVideoView) findViewById(R.id.video_guide);
+        if (FatConfigManager.getInstance().getCurBodyParts().getGuideVideo() != null) {
+            this.customVideoView.setVideoURI(Uri.parse("android.resource://com.mxsella.fat/" + FatConfigManager.getInstance().getCurBodyParts().getGuideVideo()));
+            this.customVideoView.setVisibility(View.VISIBLE);
+        } else {
+            this.customVideoView.setVisibility(View.GONE);
+            binding.otherGuide.setText(R.string.common_fat_measure);
+            binding.otherGuide.setVisibility(View.VISIBLE);
+            binding.shareMeasure.setVisibility(View.VISIBLE);
+            binding.bodyPosition.setVisibility(View.VISIBLE);
+        }
+        playGuideVideo();
+        binding.viewMeasure.setDepth(FatConfigManager.getInstance().getCurDeviceDepth(), MxsellaDeviceManager.getInstance().getOcxo(), BitmapUtil.sBitmapHight);
+        binding.viewDividingRule.setOcxo(MxsellaDeviceManager.getInstance().getOcxo(), BitmapUtil.sBitmapHight);
+
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_fat_measure_plus;
+    }
+
+
+    @Override
+    public void onConnected() {
+        binding.statusTip.setText(R.string.collected);
+    }
 
     private void measureResult(final BitmapMsg bitmapMsg, final boolean z) {
         Log.i(TAG, "=============measureResult=start");
@@ -261,13 +397,13 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
                     bitmapMsg.setBitmap(imageOneDimensional2);
                     bitmapMsg.setFatThickness((f * algoDepth) / BitmapUtil.sBitmapHight);
                     bitmapMsg.setArray(measure);
-                    FatMeasurePlusActivity.this.fatMeasurePlusBinding.viewMeasure.setArray(measure, FatRecord.TYPE.FAT);
+                    binding.viewMeasure.setArray(measure, FatRecord.TYPE.FAT);
                     message.what = 3;
                 } else {
                     bitmapMsg.setFatThickness(f);
                     message.what = 2;
                 }
-                FatMeasurePlusActivity.this.mHandler.sendMessage(message);
+                mHandler.sendMessage(message);
             });
         }
     }
@@ -283,11 +419,26 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
     protected void onRestart() {
         super.onRestart();
         playGuideVideo();
+        CustomVideoView customVideoView = this.customLineVideoView;
+        if (customVideoView == null || customVideoView.isPlaying()) {
+            return;
+        }
+        this.customLineVideoView.start();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        CustomVideoView customVideoView = this.customVideoView;
+        if (customVideoView != null && customVideoView.isPlaying()) {
+            this.customVideoView.stopPlayback();
+        }
+        CustomVideoView customVideoView2 = this.customLineVideoView;
+        if (customVideoView2 == null || !customVideoView2.isPlaying()) {
+            return;
+        }
+        this.customLineVideoView.stopPlayback();
+
     }
 
     @Override
@@ -302,13 +453,30 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
 
     private void toStartMeasure() {
         BitmapUtil.frame = 0L;
-        this.isAgainMeasure = false;
-        this.fatMeasurePlusBinding.viewMeasure.setPosition(0.0f);
-        this.fatMeasurePlusBinding.viewMeasure.setArray(null, FatRecord.TYPE.FAT);
-        this.measureDividingRuleView.setInit(this.fatMeasurePlusBinding.ivImage.getWidth(), this.fatMeasurePlusBinding.ivImage.getHeight(), FatConfigManager.getInstance().getCurDeviceDepth());
-        this.mHandler.removeMessages(5);
-        this.fatMeasurePlusBinding.analysisButton.setVisibility(View.GONE);
-        this.mTvStatusTip.setVisibility(View.VISIBLE);
+        isAgainMeasure = false;
+        binding.resultValue.setVisibility(View.INVISIBLE);
+        binding.viewMeasure.setPosition(0.0f);
+        binding.viewMeasure.setArray(null, FatRecord.TYPE.FAT);
+        binding.viewDividingRule.setInit(binding.ivImage.getWidth(), binding.ivImage.getHeight(), FatConfigManager.getInstance().getCurDeviceDepth());
+        mHandler.removeMessages(5);
+        binding.rlUnFound.setVisibility(View.GONE);
+        binding.showSaveRl.setVisibility(View.GONE);
+        binding.resultRl.setVisibility(View.GONE);
+        binding.otherGuide.setVisibility(View.GONE);
+        binding.analysisButton.setVisibility(View.GONE);
+        binding.statusTip.setVisibility(View.VISIBLE);
+        binding.shareMeasure.setVisibility(View.GONE);
+        binding.bodyPosition.setVisibility(View.GONE);
+        binding.rlAns.setVisibility(View.GONE);
+        if (FatConfigManager.getInstance().getCurBodyPositionIndex() == 11) {
+            binding.otherGuide.setText(R.string.common_fat_measure);
+            binding.otherGuide.setVisibility(View.VISIBLE);
+            binding.shareMeasure.setVisibility(View.VISIBLE);
+            binding.bodyPosition.setVisibility(View.VISIBLE);
+        } else {
+            this.customVideoView.setVisibility(View.VISIBLE);
+        }
+
         playGuideVideo();
     }
 
@@ -323,7 +491,7 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
             return;
         }
         BitmapMsg bitmapMsg = (BitmapMsg) deviceMsg;
-        int i = C198418.$SwitchMap$com$marvoto$fat$entity$BitmapMsg$State[bitmapMsg.getState().ordinal()];
+        int i = MuscleMeasureResultActivity.State.stateMap[bitmapMsg.getState().ordinal()];
         if (i == 1) {
             if (this.measureFailCount < this.thresholdValue) {
                 saveRecord();
@@ -337,8 +505,8 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
             if (i != 3) {
                 return;
             }
-            this.mTvStatusTip.setText(R.string.collecting);
-            this.fatMeasurePlusBinding.ivImage.setImageBitmap(bitmapMsg.getBitmap());
+            binding.statusTip.setText(R.string.collecting);
+            this.binding.ivImage.setImageBitmap(bitmapMsg.getBitmap());
             if (BitmapUtil.frame >= 150 || (BitmapUtil.frame > 50 && this.isAgainMeasure)) {
                 Log.i(TAG, "frame=======================: " + BitmapUtil.frame);
                 this.isAgainMeasure = true;
@@ -354,10 +522,10 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
             Log.i(TAG, "============ ");
             this.isAgainMeasure = false;
             System.gc();
-            this.mTvStatusTip.setText(R.string.collected);
+            binding.statusTip.setText(R.string.collected);
             if (!MxsellaDeviceManager.getInstance().isToBusinessVersion() && FatConfigManager.getInstance().getCurBodyPositionIndex() == 11) {
                 setVideoVisibility(false);
-                this.mTvStatusTip.setVisibility(View.GONE);
+                binding.statusTip.setVisibility(View.GONE);
             }
             if (BitmapUtil.frame >= 150 && !FatConfigManager.getInstance().isAutoMeasure()) {
                 this.mLastBitmapMsg.setBitmap(BitmapUtil.getImageOneDimensional());
@@ -369,23 +537,23 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
         }
     }
 
-    public static /* synthetic */ class C198418 {
-        static final /* synthetic */ int[] $SwitchMap$com$marvoto$fat$entity$BitmapMsg$State;
+    public static class State {
+        static final int[] stateMap;
 
         static {
-            int[] iArr = new int[BitmapMsg.State.values().length];
-            $SwitchMap$com$marvoto$fat$entity$BitmapMsg$State = iArr;
+            int[] map = new int[BitmapMsg.State.values().length];
+            stateMap = map;
             try {
-                iArr[BitmapMsg.State.START.ordinal()] = 1;
-            } catch (NoSuchFieldError unused) {
+                map[BitmapMsg.State.START.ordinal()] = 1;
+            } catch (NoSuchFieldError ignored) {
             }
             try {
-                $SwitchMap$com$marvoto$fat$entity$BitmapMsg$State[BitmapMsg.State.END.ordinal()] = 2;
-            } catch (NoSuchFieldError unused2) {
+                map[BitmapMsg.State.END.ordinal()] = 2;
+            } catch (NoSuchFieldError ignored) {
             }
             try {
-                $SwitchMap$com$marvoto$fat$entity$BitmapMsg$State[BitmapMsg.State.RUN.ordinal()] = 3;
-            } catch (NoSuchFieldError unused3) {
+                map[BitmapMsg.State.RUN.ordinal()] = 3;
+            } catch (NoSuchFieldError ignored) {
             }
         }
     }
@@ -401,9 +569,9 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
 
         ThreadUtils.execute(() -> {
             String str = MxsellaConstant.APP_DIR_PATH + "/data/";
-            String str2 = DateUtil.getDate2String(System.currentTimeMillis(), "MM_dd_HH_mm_ss") + "_" + FatConfigManager.getInstance().getCurBodyPositionIndex() + "_mm_" + FatMeasurePlusActivity.this.mLastBitmapMsg.getFatThickness() + ".png";
+            String str2 = DateUtil.getDate2String(System.currentTimeMillis(), "MM_dd_HH_mm_ss") + "_" + FatConfigManager.getInstance().getCurBodyPositionIndex() + "_mm_" + mLastBitmapMsg.getFatThickness() + ".png";
             try {
-                BitmapUtil.saveBitmap(FatMeasurePlusActivity.this.mLastBitmapMsg.getBitmap(), str, str2);
+                BitmapUtil.saveBitmap(mLastBitmapMsg.getBitmap(), str, str2);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -446,14 +614,14 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
         MxsellaDeviceManager.getInstance().unregisterDeviceInterface(this);
         FatConfigManager.getInstance().setMeasure(false);
         BitmapUtil.initList();
-        if (this.measureFailCount < this.thresholdValue) {
+        if (measureFailCount < thresholdValue) {
             saveRecord();
         }
     }
 
-    @Override // com.marvoto.fat.manager.MxsellaDeviceManager.DeviceInterface
+    @Override
     public void onDisconnected(int i, String str) {
-        this.mTvStatusTip.setText(R.string.app_measure_resule_device_disconnect);
+        binding.statusTip.setText(R.string.app_measure_resule_device_disconnect);
     }
 
     public SpannableString getSpannableStringFatValue(float f) {
@@ -472,7 +640,7 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
             @Override
             public void updateDrawState(TextPaint textPaint) {
                 super.updateDrawState(textPaint);
-                textPaint.setColor(FatMeasurePlusActivity.this.getResources().getColor(R.color.text_black_color));
+                textPaint.setColor(getResources().getColor(R.color.text_black_color));
                 textPaint.setTextSize(140.0f);
                 textPaint.setUnderlineText(false);
             }
@@ -481,6 +649,7 @@ public class FatMeasurePlusActivity extends BaseActivity implements MxsellaDevic
     }
 
     private void playGuideVideo() {
+        //播放演示视频
     }
 
     private void showOpenMeasureLineDialog() {

@@ -1,5 +1,6 @@
 package com.mxsella.fatmuscle;
 
+import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,11 +20,16 @@ import com.mxsella.fat_muscle.R;
 import com.mxsella.fat_muscle.databinding.ActivityMainBinding;
 import com.mxsella.fatmuscle.common.MyApplication;
 import com.mxsella.fatmuscle.common.base.BaseActivity;
+import com.mxsella.fatmuscle.sdk.common.Constant;
+import com.mxsella.fatmuscle.sdk.common.MxsellaConstant;
 import com.mxsella.fatmuscle.sdk.fat.MeasureDepth;
+import com.mxsella.fatmuscle.sdk.fat.entity.BitmapMsg;
+import com.mxsella.fatmuscle.sdk.fat.entity.DeviceMsg;
 import com.mxsella.fatmuscle.sdk.fat.entity.ResultMsg;
 import com.mxsella.fatmuscle.sdk.fat.interfaces.DeviceResultInterface;
 import com.mxsella.fatmuscle.sdk.fat.manager.FatConfigManager;
 import com.mxsella.fatmuscle.sdk.fat.manager.MxsellaDeviceManager;
+import com.mxsella.fatmuscle.sdk.fat.manager.OTGManager;
 import com.mxsella.fatmuscle.ui.activity.FatMeasurePlusActivity;
 import com.mxsella.fatmuscle.ui.activity.HistoryListActivity;
 import com.mxsella.fatmuscle.ui.activity.MuscleMeasureResultActivity;
@@ -34,17 +40,14 @@ import com.hjq.permissions.OnPermissionCallback;
 import com.hjq.permissions.Permission;
 import com.hjq.permissions.XXPermissions;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity<ActivityMainBinding> implements MxsellaDeviceManager.DeviceInterface{
+    private int curPositionIndex = 0;
 
-    ActivityMainBinding mainBinding;
-
-    private int curPositionIndex = 11;
-
-    public static UsbDevice usbDevice;
     /**
      * 0: 腰部
      * 1: 脸皮
@@ -59,55 +62,7 @@ public class MainActivity extends BaseActivity {
     private final int[] fat = {0, 2, 3, 5, 11};
     private final int[] muscle = {2, 6, 12};
     private final String[] str = {"腰部", "脸皮", "上臂,肱二头肌", "大腿,股直肌", "胸部", "小腿,腓肠肌", "腹部,腹直肌", "", "", "", "", "脂肪通用", "肌肉通用"};
-    private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
-
-    private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (ACTION_USB_PERMISSION.equals(action)) {
-                synchronized (this) {
-                    UsbDevice device = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        if (device != null) {
-                            // 在此处执行 USB 设备已授权的操作
-                            LogUtil.d("USB权限已经授予");
-                        }
-                    } else {
-                        // 在此处执行 USB 设备未授权的操作
-                        LogUtil.d("USB权限未被授予");
-                    }
-                }
-            }
-        }
-    };
-
-    // 请求 USB 权限
-    private void requestUsbPermission() {
-        boolean b = PermissionUtils.getInstance().hasPermission(this, ACTION_USB_PERMISSION);
-        if (b) {
-            LogUtil.d("已经有权限");
-            return;
-        }
-        LogUtil.d("没有权限");
-        UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        // 获取连接的 USB 设备列表
-        HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
-        for (UsbDevice device : deviceList.values()) {
-            // 检查每个 USB 设备是否需要权限
-            if (usbManager.hasPermission(device)) {
-                // USB 设备已经有权限
-                // 在此处执行 USB 设备已授权的操作
-                LogUtil.d("已有权限的设备: " + device.toString());
-                usbDevice = device;
-                PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-                usbManager.requestPermission(device, permissionIntent);
-            } else {
-                // USB 设备没有权限，请求权限
-                LogUtil.d("没有有权限的设备: ");
-            }
-        }
-    }
+    private MxsellaDeviceManager manager;
 
     @Override
     public void onDestroy() {
@@ -116,85 +71,128 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         requestPermission();
-        requestUsbPermission();
-        try {
-            ftD2xx = D2xxManager.getInstance(this);
-        } catch (D2xxManager.D2xxException e) {
-            e.printStackTrace();
-        }
-        if (!ftD2xx.setVIDPID(1027, 44449)) {
-            Log.i("ftd2xx-java", "setVIDPID Error");
-        }
-//        MeasureDepth.ParaSet(3.0f,3.0f);
-        mainBinding.selectPart.setText("选择的是" + str[curPositionIndex]);
-        mainBinding.fat.setOnClickListener(v -> {
+
+        MxsellaDeviceManager.getInstance().registerDeviceInterface(this);
+        manager = MxsellaDeviceManager.getInstance();
+        binding.selectPart.setText("选择的是" + str[curPositionIndex]);
+        binding.fat.setOnClickListener(v -> {
             boolean existsInFat = Arrays.stream(fat).anyMatch(value -> value == curPositionIndex);
             if (existsInFat) {
                 navToNoFinish(FatMeasurePlusActivity.class);
             }
         });
-        mainBinding.muscle.setOnClickListener(v -> {
+        binding.muscle.setOnClickListener(v -> {
             boolean existsInFat = Arrays.stream(muscle).anyMatch(value -> value == curPositionIndex);
             if (existsInFat) {
                 navToNoFinish(MuscleMeasureResultActivity.class);
             }
         });
-        mainBinding.record.setOnClickListener(v -> {
+        binding.record.setOnClickListener(v -> {
             navToNoFinish(HistoryListActivity.class);
         });
-        mainBinding.fuzhiji.setOnClickListener(v -> {
+        binding.fuzhiji.setOnClickListener(v -> {
             Log.d("mian", "fuzhiji");
             setIndex(6);
         });
-        mainBinding.gongertouji.setOnClickListener(v -> {
+        binding.gongertouji.setOnClickListener(v -> {
             Log.d("mian", "gongertouji");
 
             setIndex(2);
         });
-        mainBinding.shangbi.setOnClickListener(v -> {
+        binding.shangbi.setOnClickListener(v -> {
             Log.d("mian", "shangbi");
 
             setIndex(2);
         });
-        mainBinding.datui.setOnClickListener(v -> {
+        binding.datui.setOnClickListener(v -> {
             Log.d("mian", "datui");
 
             setIndex(3);
         });
-        mainBinding.xiaotui.setOnClickListener(v -> {
+        binding.xiaotui.setOnClickListener(v -> {
             Log.d("mian", "xiaotui");
 
             setIndex(5);
         });
 
-        mainBinding.yaobu.setOnClickListener(v -> {
+        binding.yaobu.setOnClickListener(v -> {
             Log.d("mian", "yaobu");
 
             setIndex(0);
         });
 
-        mainBinding.tongyong1.setOnClickListener(v -> {
+        binding.tongyong1.setOnClickListener(v -> {
             Log.d("mian", "tongyong1");
-
             setIndex(11);
         });
-        mainBinding.tongyong2.setOnClickListener(v -> {
-            Log.d("mian", "tongyong2");
-            setIndex(12);
-        });
-//        mainBinding.test.setOnClickListener(v -> {
-//            navToNoFinish(OpenCvTest.class);
-//        });
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_main;
     }
 
     void setIndex(int index) {
         this.curPositionIndex = index;
         FatConfigManager.getInstance().setCurBodyPositionIndex(index);
-        mainBinding.selectPart.setText("选择的是" + str[curPositionIndex]);
+        binding.selectPart.setText("选择的是" + str[curPositionIndex]);
     }
 
+    public void init(View view){
+        byte[] b1 = hexToByteArray("23E410B00000000400000000FEFEFE");
+        byte[] b2 = hexToByteArray("23E410C80000000400000000FEFEFE");
+        byte[] b3 = hexToByteArray("23E410C6000000800001020304050607090A0B0C0D0E0F1011121314151618191A1B1C1D1E1F20212324252627282A2B2C2D2F30313234353637373839393A3A3B3C3C3D3E3E3F3F404041424243444545464647474849494A4B4C4C4D4E4E4F50505050505050505050505050505050505050505050505050505050505050505050505050505050FEFEFE");
+        byte[] b4 = hexToByteArray("23E410C00000000400000003FEFEFE");
+        byte[] b5 = hexToByteArray("23E410C1000000040000001EFEFEFE");
+        byte[] b6 = hexToByteArray("23E410C50000000400640C80FEFEFE");
+        byte[] b7 = hexToByteArray("23E410C300000004FFC1017FFEFEFE");
+        byte[] b8 = hexToByteArray("23E410B10000000400000000FEFEFE");
+        byte[] b9 = hexToByteArray("23E410C80000000400000001FEFEFE");
+        ArrayList<byte[]> arr = new ArrayList<>();
+        arr.add(b1);
+        arr.add(b2);
+        arr.add(b3);
+        arr.add(b4);
+        arr.add(b5);
+        arr.add(b6);
+        arr.add(b7);
+        arr.add(b8);
+        arr.add(b9);
+
+        for (int i = 0; i < arr.size(); i++) {
+            manager.sendDatas(arr.get(i));
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static byte[] hexToByteArray(String inHex) {
+        int hexlen = inHex.length();
+        byte[] result;
+        if (hexlen % 2 == 1) {
+            //奇数
+            hexlen++;
+            result = new byte[(hexlen / 2)];
+            inHex = "0" + inHex;
+        } else {
+            //偶数
+            result = new byte[(hexlen / 2)];
+        }
+        int j = 0;
+        for (int i = 0; i < hexlen; i += 2) {
+            result[j] = hexToByte(inHex.substring(i, i + 2));
+            j++;
+        }
+        return result;
+    }
+
+    public static byte hexToByte(String inHex) {
+        return (byte) Integer.parseInt(inHex, 16);
+    }
 
     public void requestPermission() {
         XXPermissions.with(this)
@@ -223,5 +221,53 @@ public class MainActivity extends BaseActivity {
                 });
     }
 
+
+    @Override
+    public void onConnected() {
+
+    }
+
+    @Override
+    public void onDisconnected(int i, String str) {
+
+    }
+
+    @Override
+    public void onMessage(DeviceMsg deviceMsg) {
+        int msgId = deviceMsg.getMsgId();
+        if (msgId != 4261) {
+            if (msgId == 4272 || msgId == 4512) {
+                checkFimwareUpdate();
+                if (!FatConfigManager.getInstance().isFatMeasureMode() && !MxsellaDeviceManager.getInstance().isToBusinessVersion() && !MxsellaConstant.isProduct) {
+                    FatConfigManager.getInstance().setMeasureMode(1);
+                }
+                if (FatConfigManager.getInstance().getCurBodyPositionIndex() != 3 || MxsellaDeviceManager.getInstance().isToBusinessVersion()) {
+                    return;
+                }
+                FatConfigManager.getInstance().setCurBodyPositionIndex(0);
+                return;
+            }
+            return;
+        }
+        BitmapMsg bitmapMsg = (BitmapMsg) deviceMsg;
+        if (((KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE)).inKeyguardRestrictedInputMode() || bitmapMsg.getState() != BitmapMsg.State.START) {
+            return;
+        }
+        if (FatConfigManager.getInstance().isFatMeasureMode()) {
+//            if (HookManager.getInstance().isLoadPlugin()) {
+//                startProxy();
+//                return;
+//            }
+//            this.mContext.startActivity(new Intent(this.mContext, FatMeasurePlusActivity.class));
+//            overridePendingTransition(17432576, 17432577);
+            return;
+        }
+//        this.mContext.startActivity(new Intent(this.mContext, MuscleMeasureResultActivity.class));
+//        overridePendingTransition(17432576, 17432577);
+
+    }
+    private void checkFimwareUpdate() {
+
+    }
 
 }

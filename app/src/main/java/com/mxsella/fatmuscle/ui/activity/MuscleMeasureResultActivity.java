@@ -43,11 +43,7 @@ import com.mxsella.fatmuscle.view.SlideLineView;
 import com.mxsella.fatmuscle.view.dialog.CustomDialog;
 import com.mxsella.fatmuscle.view.widget.FlashHelper;
 
-public class MuscleMeasureResultActivity extends BaseActivity implements View.OnClickListener, MxsellaDeviceManager.DeviceInterface, SlideLineView.MeasureListener {
-
-    ActivityMuscleMeasureResultBinding measureResultBinding;
-
-
+public class MuscleMeasureResultActivity extends BaseActivity<ActivityMuscleMeasureResultBinding> implements View.OnClickListener, MxsellaDeviceManager.DeviceInterface, SlideLineView.MeasureListener {
     private static final int CLOSE_FLASH_VIEW = 5;
     private static final int CLOSE_OPERATION_TIP = 4;
     private static final int DELAY = 1;
@@ -102,20 +98,20 @@ public class MuscleMeasureResultActivity extends BaseActivity implements View.On
     });
 
     public void initOnClick() {
-        measureResultBinding.analysisButton.setOnClickListener(v -> {
+        binding.analysisButton.setOnClickListener(v -> {
             this.mSlideLineView.setMeasure(true);
-            measureResultBinding.analysisButton.setVisibility(View.GONE);
-            measureResultBinding.tvTitle.setText(R.string.muscle_manual_result_note);
+            binding.analysisButton.setVisibility(View.GONE);
+            binding.tvTitle.setText(R.string.muscle_manual_result_note);
         });
-        measureResultBinding.cancle.setOnClickListener(v -> {
+        binding.cancle.setOnClickListener(v -> {
             this.isSaveRecord = false;
-            measureResultBinding.analysisButton.setVisibility(View.VISIBLE);
+            binding.analysisButton.setVisibility(View.VISIBLE);
             this.mSlideLineView.clearLine();
             this.mRoundView.setVisibility(View.INVISIBLE);
             this.mShowSaveRl.setVisibility(View.INVISIBLE);
             this.mIvBodyIcon.setVisibility(View.VISIBLE);
         });
-        measureResultBinding.save.setOnClickListener(v -> {
+        binding.save.setOnClickListener(v -> {
             this.isSaveRecord = true;
             Log.d(TAG, "点击了保存");
             this.mShowSaveRl.setVisibility(View.INVISIBLE);
@@ -139,7 +135,6 @@ public class MuscleMeasureResultActivity extends BaseActivity implements View.On
 
     @Override
     protected void initView() {
-        measureResultBinding = DataBindingUtil.setContentView(this, R.layout.activity_muscle_measure_result);
         initPer();
         MxsellaDeviceManager.getInstance().connectDevice();
 
@@ -176,7 +171,7 @@ public class MuscleMeasureResultActivity extends BaseActivity implements View.On
         this.mIvImage.setImageBitmap(BitmapUtil.getImageOneDimensional());
         BodyParts curBodyParts = FatConfigManager.getInstance().getCurBodyParts();
         this.curBodyPars = curBodyParts;
-        measureResultBinding.tvTitle.setText(getString(R.string.muscle_discover, new Object[]{getString(curBodyParts.getMusclePartTip().intValue())}));
+        binding.tvTitle.setText(getString(R.string.muscle_discover, new Object[]{getString(curBodyParts.getMusclePartTip().intValue())}));
         String str = MxsellaConstant.GUIDE_TIP + this.curBodyPars.getIndex();
 
         this.mIvBodyIcon.setImageResource(this.curBodyPars.getMusclePartIcon().intValue());
@@ -184,6 +179,11 @@ public class MuscleMeasureResultActivity extends BaseActivity implements View.On
         this.mSlideLineView.setMeasureListener(this);
 
         initOnClick();
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_muscle_measure_result;
     }
 
     @Override
@@ -208,7 +208,7 @@ public class MuscleMeasureResultActivity extends BaseActivity implements View.On
         this.mShowSaveRl.setVisibility(View.VISIBLE);
     }
 
-    @Override // com.marvoto.fat.widget.SlideLineView.MeasureListener
+    @Override
     public void endMeasure() {
         this.mRoundView.setVisibility(View.INVISIBLE);
         this.mIvBodyIcon.setVisibility(View.VISIBLE);
@@ -218,10 +218,10 @@ public class MuscleMeasureResultActivity extends BaseActivity implements View.On
         this.mShowSaveRl.setVisibility(View.GONE);
     }
 
-    @Override // com.marvoto.fat.manager.MxsellaDeviceManager.DeviceInterface
+    @Override
     public void onConnected() {
-        measureResultBinding.tvTitle.setText("");
-        measureResultBinding.tvTitle.setText(getString(R.string.muscle_discover, new Object[]{getString(this.curBodyPars.getMusclePartTip().intValue())}));
+        binding.tvTitle.setText("");
+        binding.tvTitle.setText(getString(R.string.muscle_discover, new Object[]{getString(this.curBodyPars.getMusclePartTip().intValue())}));
     }
 
     @Override
@@ -259,7 +259,7 @@ public class MuscleMeasureResultActivity extends BaseActivity implements View.On
                 saveRecord();
             }
             this.mTvanalysis.setVisibility(View.GONE);
-            measureResultBinding.tvTitle.setText(getString(R.string.muscle_discover, new Object[]{getString(this.curBodyPars.getMusclePartTip().intValue())}));
+            binding.tvTitle.setText(getString(R.string.muscle_discover, new Object[]{getString(this.curBodyPars.getMusclePartTip().intValue())}));
             this.measureFailCount = 0;
             LogUtil.i("frame======================start=: ");
             BitmapUtil.frame = 0L;
@@ -285,7 +285,7 @@ public class MuscleMeasureResultActivity extends BaseActivity implements View.On
             System.gc();
             this.mLastBitmapMsg = bitmapMsg;
             MxsellaDeviceManager.getInstance().setEnd(true);
-            measureResultBinding.analysisButton.setVisibility(View.VISIBLE);
+            binding.analysisButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -330,8 +330,8 @@ public class MuscleMeasureResultActivity extends BaseActivity implements View.On
 
     @Override
     public void onDisconnected(int i, String str) {
-        measureResultBinding.tvTitle.setVisibility(View.VISIBLE);
-        measureResultBinding.tvTitle.setText(R.string.app_measure_resule_device_disconnect);
+        binding.tvTitle.setVisibility(View.VISIBLE);
+        binding.tvTitle.setText(R.string.app_measure_resule_device_disconnect);
     }
 
     private void saveRecord() {
